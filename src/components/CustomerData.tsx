@@ -1,6 +1,6 @@
 import { Input } from "antd";
 import React, { useState } from "react";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, WhatsAppOutlined } from "@ant-design/icons";
 
 const MyComponent = () => {
   const [name, setName] = useState("");
@@ -23,7 +23,7 @@ const MyComponent = () => {
         onChange={(e) => setNumber(e.target.value)}
         size='large'
         placeholder='Tu teléfono'
-        prefix={<UserOutlined />}
+        prefix={<WhatsAppOutlined />}
       />
     </div>
   );
