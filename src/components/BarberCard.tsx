@@ -69,7 +69,7 @@ const RecipeReviewCard: React.FC<CardProps> = ({
           alt='Paella dish'
         />
         <CardContent>
-          <Typography variant='h6' color='text.primary'>
+          <Typography variant='body1' color='text.primary'>
             Nombre barbero
           </Typography>
           <Typography variant='body2' color='text.secondary'>
