@@ -1,40 +1,81 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import Collapse from "@mui/material/Collapse";
+import Avatar from "@mui/material/Avatar";
+import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import { red } from "@mui/material/colors";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from "@mui/icons-material/Share";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import BARBERO from "../assets/BARBERO.webp";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { CardActionArea } from "@mui/material";
+import { Button } from "@mui/material";
 
-export default function BarberCard() {
+interface ExpandMoreProps extends IconButtonProps {
+  expand: boolean;
+}
+
+const ExpandMore = styled((props: ExpandMoreProps) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+  transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+  marginLeft: "auto",
+  transition: theme.transitions.create("transform", {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
+
+export default function RecipeReviewCard() {
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
   return (
-    <Card sx={{ display: "flex", marginTop: 3 }}>
-      <CardActionArea>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <CardMedia
-            component='img'
-            sx={{ width: 90 }}
-            image={BARBERO}
-            alt='Live from space album cover'
-          />
-          <CardContent sx={{}}>
-            <h2 className='font-semibold'>Nombre de Barbero 1</h2>
-
-            <Typography
-              variant='subtitle1'
-              color='text.secondary'
-              component='div'
-            >
-              Descripción barbero
-            </Typography>
-          </CardContent>
-          <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
-            <ArrowForwardIosIcon sx={{ height: 38, width: 38 }} />
-          </Box>
-        </Box>
-      </CardActionArea>
+    <Card sx={{ maxWidth: "auto", marginTop: 3 }}>
+      <div className='flex justify-between'>
+        <CardMedia
+          component='img'
+          sx={{ width: 100 }}
+          image={BARBERO}
+          alt='Paella dish'
+        />
+        <CardContent>
+          <Typography variant='h6' color='text.primary'>
+            Descripción barbero
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Descripción barbero
+          </Typography>
+        </CardContent>
+        <CardActions disableSpacing>
+          <ExpandMore
+            expand={expanded}
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label='show more'
+          >
+            <ExpandMoreIcon />
+          </ExpandMore>
+        </CardActions>
+      </div>
+      <Collapse in={expanded} timeout='auto' unmountOnExit>
+        <CardContent>
+          <h2 className='font-semibold mb-3'>Servicios:</h2>
+          <div className='space-y-4'>
+            <Button variant='outlined'>Corte de Cabello $20.000</Button>
+            <Button variant='outlined'>Corte de Cabello + Barba $23.000</Button>
+          </div>
+        </CardContent>
+      </Collapse>
     </Card>
   );
 }
