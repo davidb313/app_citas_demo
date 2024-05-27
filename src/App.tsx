@@ -1,26 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import LooksOneIcon from "@mui/icons-material/LooksOne";
+import BarberCard from "./components/BarberCard";
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='p-5'>
+      <h1 className='mt-5 flex text-3xl font-bold justify-center '>
+        App de citas
+      </h1>
+
+      <div className='mt-10 flex gap-x-2'>
+        <LooksOneIcon />
+        <h3 className='font-bold'>Selecciona a tu barbero</h3>
+      </div>
+      <BarberCard />
+      <BarberCard />
+      <BarberCard />
     </div>
   );
 }
-
-export default App;
