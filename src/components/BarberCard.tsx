@@ -44,7 +44,7 @@ export default function RecipeReviewCard() {
         />
         <CardContent>
           <Typography variant='h6' color='text.primary'>
-            Descripción barbero
+            Nombre barbero
           </Typography>
           <Typography variant='body2' color='text.secondary'>
             Descripción barbero
