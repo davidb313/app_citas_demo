@@ -34,7 +34,7 @@ export const DatePickerComponent: React.FC = () => {
 
   return (
     <>
-      <div className='flex mt-4 space-x-4'>
+      <div className='flex mt-6 space-x-4'>
         <Button
           type={selectedButton === "today" ? "primary" : "default"}
           onClick={setToday}
