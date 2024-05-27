@@ -9,7 +9,7 @@ import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import BARBERO from "../assets/BARBERO.webp";
-import { Button } from "@mui/material";
+import { Button } from "antd";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -26,11 +26,37 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-export default function RecipeReviewCard() {
+interface CardProps {
+  id: string;
+  selectedCard: string | null;
+  setSelectedCard: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedService: string | null;
+  setSelectedService: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+const RecipeReviewCard: React.FC<CardProps> = ({
+  id,
+  selectedCard,
+  setSelectedCard,
+  selectedService,
+  setSelectedService,
+}) => {
   const [expanded, setExpanded] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const handleServiceClick = (service: string) => {
+    if (selectedCard === null || selectedCard === id) {
+      if (selectedService === service && selectedCard === id) {
+        setSelectedService(null);
+        setSelectedCard(null);
+      } else {
+        setSelectedService(service);
+        setSelectedCard(id);
+      }
+    }
   };
 
   return (
@@ -65,11 +91,55 @@ export default function RecipeReviewCard() {
         <CardContent>
           <h2 className='font-semibold mb-3'>Servicios:</h2>
           <div className='space-y-4'>
-            <Button variant='outlined'>Corte de Cabello $20.000</Button>
-            <Button variant='outlined'>Corte de Cabello + Barba $23.000</Button>
+            <Button
+              type={
+                selectedService === "corte" && selectedCard === id
+                  ? "primary"
+                  : "default"
+              }
+              onClick={() => handleServiceClick("corte")}
+              disabled={selectedCard !== null && selectedCard !== id}
+            >
+              Corte de Cabello $20.000
+            </Button>
+            <Button
+              type={
+                selectedService === "corte_barba" && selectedCard === id
+                  ? "primary"
+                  : "default"
+              }
+              onClick={() => handleServiceClick("corte_barba")}
+              disabled={selectedCard !== null && selectedCard !== id}
+            >
+              Corte de Cabello + Barba $23.000
+            </Button>
           </div>
         </CardContent>
       </Collapse>
     </Card>
   );
-}
+};
+
+const CardContainer: React.FC = () => {
+  const [selectedCard, setSelectedCard] = React.useState<string | null>(null);
+  const [selectedService, setSelectedService] = React.useState<string | null>(
+    null
+  );
+
+  return (
+    <div>
+      {["card1", "card2", "card3"].map((id) => (
+        <RecipeReviewCard
+          key={id}
+          id={id}
+          selectedCard={selectedCard}
+          setSelectedCard={setSelectedCard}
+          selectedService={selectedService}
+          setSelectedService={setSelectedService}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default CardContainer;
