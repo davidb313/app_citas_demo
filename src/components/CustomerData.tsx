@@ -1,26 +1,32 @@
 import { Input } from "antd";
-import React, { useState } from "react";
 import { UserOutlined, WhatsAppOutlined } from "@ant-design/icons";
 
-const MyComponent = () => {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+interface CustomerDataProps {
+  customerName: string;
+  setCustomerName: (name: string) => void;
+  customerNumber: string;
+  setCustomerNumber: (number: string) => void;
+}
 
-  console.log(name, number);
-
+export const CustomerData: React.FC<CustomerDataProps> = ({
+  customerName,
+  setCustomerName,
+  customerNumber,
+  setCustomerNumber,
+}) => {
   return (
     <div className='mt-6 space-y-4'>
       <Input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={customerName}
+        onChange={(e) => setCustomerName(e.target.value)}
         size='large'
         placeholder='Tu nombre'
         prefix={<UserOutlined />}
       />
       <Input
-        value={number}
+        value={customerNumber}
         type='number'
-        onChange={(e) => setNumber(e.target.value)}
+        onChange={(e) => setCustomerNumber(e.target.value)}
         size='large'
         placeholder='Tu teléfono'
         prefix={<WhatsAppOutlined />}
@@ -28,5 +34,3 @@ const MyComponent = () => {
     </div>
   );
 };
-
-export default MyComponent;

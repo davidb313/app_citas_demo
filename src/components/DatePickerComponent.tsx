@@ -1,37 +1,25 @@
-import React, { useState } from "react";
-import type { DatePickerProps } from "antd";
-import { Button, DatePicker } from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import { Button, DatePicker, DatePickerProps } from "antd";
+import { Dayjs } from "dayjs";
 
-export const DatePickerComponent: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [selectedButton, setSelectedButton] = useState<string | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+interface DatePickerComponentProps {
+  selectedDate: Dayjs | null;
+  selectedButton: string | null;
+  selectedTime: string | null;
+  setToday: () => void;
+  setTomorrow: () => void;
+  selectTime: (time: string) => void;
+  onChange: DatePickerProps["onChange"];
+}
 
-  const onChange: DatePickerProps["onChange"] = (date, dateString) => {
-    console.log(date, dateString);
-    setSelectedDate(date);
-    setSelectedButton(null);
-  };
-
-  const setToday = () => {
-    const today = dayjs();
-    setSelectedDate(today);
-    setSelectedButton("today");
-    setSelectedTime(null); // Reset selected time
-  };
-
-  const setTomorrow = () => {
-    const tomorrow = dayjs().add(1, "day");
-    setSelectedDate(tomorrow);
-    setSelectedButton("tomorrow");
-    setSelectedTime(null); // Reset selected time
-  };
-
-  const selectTime = (time: string) => {
-    setSelectedTime(time);
-  };
-
+export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
+  selectedDate,
+  selectedButton,
+  selectedTime,
+  setToday,
+  setTomorrow,
+  selectTime,
+  onChange,
+}) => {
   return (
     <>
       <div className='flex mt-6 space-x-4'>

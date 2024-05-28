@@ -68,7 +68,7 @@ const RecipeReviewCard: React.FC<CardProps> = ({
           image={BARBERO}
           alt='Paella dish'
         />
-        <CardContent>
+        <CardContent onClick={handleExpandClick}>
           <Typography variant='body1' color='text.primary'>
             Nombre barbero
           </Typography>
@@ -121,19 +121,21 @@ const RecipeReviewCard: React.FC<CardProps> = ({
 };
 
 const CardContainer: React.FC = () => {
-  const [selectedCard, setSelectedCard] = React.useState<string | null>(null);
+  const [selectedBarber, setSelectedBarber] = React.useState<string | null>(
+    null
+  );
   const [selectedService, setSelectedService] = React.useState<string | null>(
     null
   );
-
+  console.log(selectedBarber, selectedService);
   return (
     <div>
-      {["card1", "card2", "card3"].map((id) => (
+      {["idBarbero"].map((id) => (
         <RecipeReviewCard
           key={id}
           id={id}
-          selectedCard={selectedCard}
-          setSelectedCard={setSelectedCard}
+          selectedCard={selectedBarber}
+          setSelectedCard={setSelectedBarber}
           selectedService={selectedService}
           setSelectedService={setSelectedService}
         />
