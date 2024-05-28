@@ -15,6 +15,7 @@ import { Card, CardMedia, Typography } from "@mui/material";
 
 interface CardProps {
   id: string;
+  name: string;
   selectedBarber: string | null;
   setSelectedBarber: React.Dispatch<React.SetStateAction<string | null>>;
   selectedService: string | null;
@@ -22,7 +23,9 @@ interface CardProps {
 }
 
 export default function App() {
-  //Babrbers List
+  //Barbers List
+  const [allBarbers, setAllBarbers] = useState<any>([]);
+
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
@@ -38,8 +41,27 @@ export default function App() {
   //Confirm Message
   const [messageApi, contextHolder] = message.useMessage();
 
+  //Barbers Logic
+  const getAllBarbers = async () => {
+    try {
+      const response = await client.from("barberos").select();
+      if (response.status === 200) {
+        setAllBarbers(response.data);
+      }
+      console.log("hola", response);
+    } catch (err) {
+      error();
+    }
+  };
+
+  useEffect(() => {
+    getAllBarbers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const RecipeReviewCard: React.FC<CardProps> = ({
     id,
+    name,
     selectedBarber,
     setSelectedBarber,
     selectedService,
@@ -68,7 +90,7 @@ export default function App() {
           />
           <div className='ml-4'>
             <Typography variant='h6' color='text.primary'>
-              Nombre Barbero
+              {name}
             </Typography>
 
             <div className='mt-2 mb-2'>
@@ -109,16 +131,6 @@ export default function App() {
     );
   };
 
-  //Barbers Logic
-  /* const getAllBarbers = async () => {
-    const response = await client.from("barberos").select();
-    console.log(response);
-  }; */
-
-  /*  useEffect(() => {
-    getAllBarbers();
-  }, []); */
-
   //Date Picker logic
   const onChange: DatePickerProps["onChange"] = (date, dateString) => {
     setSelectedDate(date);
@@ -156,19 +168,20 @@ export default function App() {
     messageApi.open({
       type: "error",
       content:
-        "La cita no pudo agendarse, comunícate con en el establecimiento",
+        "Sucedío un error en la App, comunícate con en el establecimiento",
     });
   };
 
   const handleSudmit = async () => {
     try {
       const response = await client.from("citas").insert({
+        barbero: selectedBarber,
+        servicio: selectedService,
         fecha_servicio: selectedDate,
         hora_servicio: selectedTime,
         nombre_cliente: customerName,
         telefono_cliente: customerNumber,
       });
-      console.log(response);
       if (response?.status === 200 || response?.status === 201) {
         success();
         setSelectedDate(null);
@@ -176,6 +189,8 @@ export default function App() {
         setSelectedButton(null);
         setCustomerName("");
         setCustomerNumber("");
+        setSelectedBarber("");
+        setSelectedService("");
       }
     } catch (err) {
       error();
@@ -195,10 +210,11 @@ export default function App() {
           <h3 className='font-bold'>Selecciona a tu barbero</h3>
         </div>
         <div>
-          {["idBarbero"].map((id) => (
+          {allBarbers?.map((barber: any) => (
             <RecipeReviewCard
-              key={id}
-              id={id}
+              key={barber?.id}
+              id={barber?.id}
+              name={barber?.nombre_barbero}
               selectedBarber={selectedBarber}
               setSelectedBarber={setSelectedBarber}
               selectedService={selectedService}
