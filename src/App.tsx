@@ -59,50 +59,50 @@ export default function App() {
 
     return (
       <Card sx={{ maxWidth: "auto", marginTop: 3 }}>
-        <div className='flex items-center'>
+        <div className='flex'>
           <CardMedia
             component='img'
-            sx={{ height: 90, width: 90, objectFit: "cover" }} // Ajustar el tamaño de la imagen
+            sx={{ height: "auto", width: 100, objectFit: "cover" }}
             image={BARBERO}
             alt='foto barbero'
           />
           <div className='ml-4'>
             <Typography variant='h6' color='text.primary'>
-              Barbero desde base de datos
+              Nombre Barbero
             </Typography>
-          </div>
-        </div>
 
-        <div className='p-2'>
-          <Typography variant='body2' color='text.secondary'>
-            Escoge un servicio:
-          </Typography>
+            <div className='mt-2 mb-2'>
+              <Typography variant='body2' color='text.secondary'>
+                Escoge un servicio:
+              </Typography>
 
-          <div className='flex flex-wrap mt-2 gap-2'>
-            <Button
-              type={
-                selectedService === "corte" && selectedBarber === id
-                  ? "primary"
-                  : "default"
-              }
-              onClick={() => handleServiceClick("corte")}
-              disabled={selectedBarber !== null && selectedBarber !== id}
-              size='small' // Agrega esta línea para hacer el botón más pequeño
-            >
-              Corte de Cabello $20.000
-            </Button>
-            <Button
-              type={
-                selectedService === "corte_barba" && selectedBarber === id
-                  ? "primary"
-                  : "default"
-              }
-              onClick={() => handleServiceClick("corte_barba")}
-              disabled={selectedBarber !== null && selectedBarber !== id}
-              size='small' // Agrega esta línea para hacer el botón más pequeño
-            >
-              Corte de Cabello + Barba $23.000
-            </Button>
+              <div className='flex flex-wrap mt-2 gap-2'>
+                <Button
+                  type={
+                    selectedService === "corte" && selectedBarber === id
+                      ? "primary"
+                      : "default"
+                  }
+                  onClick={() => handleServiceClick("corte")}
+                  disabled={selectedBarber !== null && selectedBarber !== id}
+                  size='small' // Agrega esta línea para hacer el botón más pequeño
+                >
+                  Corte de Cabello $20.000
+                </Button>
+                <Button
+                  type={
+                    selectedService === "corte_barba" && selectedBarber === id
+                      ? "primary"
+                      : "default"
+                  }
+                  onClick={() => handleServiceClick("corte_barba")}
+                  disabled={selectedBarber !== null && selectedBarber !== id}
+                  size='small' // Agrega esta línea para hacer el botón más pequeño
+                >
+                  Corte de Cabello + Barba $23.000
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
