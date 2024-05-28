@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Citas para Barberia",
+  "name": "Citas para Barberia",
   "icons": [
     {
       "src": "favicon.ico",
