@@ -62,23 +62,23 @@ export default function App() {
         <div className='flex items-center'>
           <CardMedia
             component='img'
-            sx={{ height: 70, width: 70, objectFit: "cover" }} // Ajustar el tamaño de la imagen
+            sx={{ height: 90, width: 90, objectFit: "cover" }} // Ajustar el tamaño de la imagen
             image={BARBERO}
             alt='foto barbero'
           />
           <div className='ml-4'>
             <Typography variant='h6' color='text.primary'>
-              Nombre barbero
+              Barbero desde base de datos
             </Typography>
           </div>
         </div>
 
         <div className='p-2'>
           <Typography variant='body2' color='text.secondary'>
-            Escoge un servicio
+            Escoge un servicio:
           </Typography>
 
-          <div className='flex flex-wrap mt-1 space-y-2'>
+          <div className='flex flex-wrap mt-2 gap-2'>
             <Button
               type={
                 selectedService === "corte" && selectedBarber === id
