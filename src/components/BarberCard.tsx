@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import BARBERO from "../assets/BARBERO.webp";
 import { Button } from "antd";
+import { client } from "../supabase/client";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -127,7 +128,16 @@ const CardContainer: React.FC = () => {
   const [selectedService, setSelectedService] = React.useState<string | null>(
     null
   );
-  console.log(selectedBarber, selectedService);
+
+  const getAllBarbers = async () => {
+    const response = await client.from("barberos").select();
+    console.log(response);
+  };
+
+  React.useEffect(() => {
+    getAllBarbers();
+  }, []);
+
   return (
     <div>
       {["idBarbero"].map((id) => (
