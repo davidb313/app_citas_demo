@@ -110,14 +110,14 @@ export default function App() {
   };
 
   //Barbers Logic
-  const getAllBarbers = async () => {
+  /* const getAllBarbers = async () => {
     const response = await client.from("barberos").select();
     console.log(response);
-  };
+  }; */
 
-  useEffect(() => {
+  /*  useEffect(() => {
     getAllBarbers();
-  }, []);
+  }, []); */
 
   //Date Picker logic
   const onChange: DatePickerProps["onChange"] = (date, dateString) => {
