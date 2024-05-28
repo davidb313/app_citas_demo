@@ -1,5 +1,5 @@
 import { Button, DatePicker, DatePickerProps } from "antd";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 interface DatePickerComponentProps {
   selectedDate: Dayjs | null;
@@ -20,6 +20,10 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
   selectTime,
   onChange,
 }) => {
+  const disabledDate = (current: any) => {
+    // Can not select days before today
+    return current && current < dayjs().startOf("day");
+  };
   return (
     <>
       <div className='flex mt-6 space-x-4'>
@@ -37,6 +41,8 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
         </Button>
         <DatePicker
           className='w-screen'
+          allowClear={true}
+          disabledDate={disabledDate}
           placeholder='Selecciona otro día'
           value={selectedDate}
           onChange={onChange}
