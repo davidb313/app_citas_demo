@@ -1,15 +1,23 @@
-import { Button, DatePicker, DatePickerProps } from "antd";
+import { Button, DatePicker, DatePickerProps, TimePickerProps } from "antd";
 import dayjs, { Dayjs } from "dayjs";
+import { TimePicker } from "antd";
 
 interface DatePickerComponentProps {
   selectedDate: Dayjs | null;
   selectedButton: string | null;
-  selectedTime: string | null;
+  selectedTime: Dayjs | null;
   setToday: () => void;
   setTomorrow: () => void;
-  selectTime: (time: string) => void;
   onChange: DatePickerProps["onChange"];
+  onChangeTime: TimePickerProps["onChange"];
 }
+
+type DisabledTime = (now: Dayjs) => {
+  disabledHours?: () => number[];
+  disabledMinutes?: (selectedHour: number) => number[];
+};
+
+const format = "HH:mm";
 
 export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
   selectedDate,
@@ -17,13 +25,35 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
   selectedTime,
   setToday,
   setTomorrow,
-  selectTime,
   onChange,
+  onChangeTime,
 }) => {
   const disabledDate = (current: any) => {
-    // Can not select days before today
     return current && current < dayjs().startOf("day");
   };
+
+  const currentTime = dayjs();
+
+  const disabledTime: DisabledTime = (now) => {
+    const currentHour = now.hour();
+    const currentMinute = now.minute();
+
+    const disablePastHours = () => {
+      return Array.from({ length: currentHour }, (_, i) => i);
+    };
+
+    const disablePastMinutes = (selectedHour: number) => {
+      if (selectedHour === currentHour) {
+        return Array.from({ length: currentMinute }, (_, i) => i);
+      }
+      return [];
+    };
+    return {
+      disabledHours: disablePastHours,
+      disabledMinutes: disablePastMinutes,
+    };
+  };
+
   return (
     <>
       <div className='flex mt-6 space-x-4'>
@@ -51,20 +81,18 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
 
       {selectedDate && (
         <>
-          <p className='mt-4 font-medium'>Selecciona un horario</p>
-          <div className='flex flex-wrap mt-4 gap-x-2 gap-y-3'>
-            {["9:00 am", "10:00 am", "11:00 am", "2:00 pm", "4:00 pm"].map(
-              (time) => (
-                <Button
-                  key={time}
-                  type={selectedTime === time ? "primary" : "dashed"}
-                  onClick={() => selectTime(time)}
-                >
-                  {time}
-                </Button>
-              )
-            )}
-          </div>
+          <TimePicker
+            disabledTime={() => disabledTime(currentTime)}
+            className='mt-4 w-full'
+            use12Hours
+            allowClear={true}
+            minuteStep={15}
+            placeholder='Selecciona la hora'
+            format={format}
+            value={selectedTime}
+            onChange={onChangeTime}
+            showNow={false}
+          />
         </>
       )}
     </>

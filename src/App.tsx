@@ -3,9 +3,9 @@ import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import BARBERO from "../src/assets/BARBERO.webp";
-
+import logoBarberia from "../src/assets/logoBarberia.png";
 import { DatePickerComponent } from "./components/DatePickerComponent";
-import { Button, DatePickerProps, message } from "antd";
+import { Button, DatePickerProps, TimePickerProps, message } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { CustomerData } from "./components/CustomerData";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ export default function App() {
   //Date Picker
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<Dayjs | null>(null);
 
   //Customer Data
   const [customerName, setCustomerName] = useState("");
@@ -48,11 +48,12 @@ export default function App() {
       if (response.status === 200) {
         setAllBarbers(response.data);
       }
-      console.log("hola", response);
     } catch (err) {
       error();
     }
   };
+
+  console.log(selectedTime);
 
   useEffect(() => {
     getAllBarbers();
@@ -121,7 +122,7 @@ export default function App() {
                   disabled={selectedBarber !== null && selectedBarber !== id}
                   size='small' // Agrega esta línea para hacer el botón más pequeño
                 >
-                  Corte de Cabello + Barba $23.000
+                  Corte + Barba $23.000
                 </Button>
               </div>
             </div>
@@ -132,9 +133,13 @@ export default function App() {
   };
 
   //Date Picker logic
-  const onChange: DatePickerProps["onChange"] = (date, dateString) => {
+  const onChange: DatePickerProps["onChange"] = (date) => {
     setSelectedDate(date);
     setSelectedButton(null);
+  };
+
+  const onChangeTime: TimePickerProps["onChange"] = (time) => {
+    setSelectedTime(time);
   };
 
   const setToday = () => {
@@ -151,9 +156,9 @@ export default function App() {
     setSelectedTime(null); // Reset selected time
   };
 
-  const selectTime = (time: string) => {
+  /* const selectTime = (time: string) => {
     setSelectedTime(time);
-  };
+  }; */
 
   //Confirm Message
   const success = () => {
@@ -178,7 +183,7 @@ export default function App() {
         barbero: selectedBarber,
         servicio: selectedService,
         fecha_servicio: selectedDate,
-        hora_servicio: selectedTime,
+        hora_servicio: selectedTime?.format("HH:mm"),
         nombre_cliente: customerName,
         telefono_cliente: customerNumber,
       });
@@ -201,13 +206,16 @@ export default function App() {
     <>
       {contextHolder}
       <div className='p-5'>
-        <h1 className='mt-5 flex text-3xl font-bold justify-center '>
-          App de citas para Barbería
-        </h1>
+        <div className='flex flex-col items-center'>
+          <img height='200' width='200' src={logoBarberia} alt='logo' />
+          <h1 className='text-3xl font-bold'>App de citas para Barbería</h1>
+        </div>
 
         <div className='mt-10 flex gap-x-2'>
           <LooksOneIcon />
-          <h3 className='font-bold'>Selecciona a tu barbero</h3>
+          <h3 className='font-bold'>
+            Selecciona el servicio de tu barbero favorito
+          </h3>
         </div>
         <div>
           {allBarbers?.map((barber: any) => (
@@ -225,7 +233,7 @@ export default function App() {
 
         <div className='mt-10 flex gap-x-2'>
           <LooksTwoIcon />
-          <h3 className='font-bold'>Selecciona un día</h3>
+          <h3 className='font-bold'>Selecciona el día</h3>
         </div>
         <DatePickerComponent
           selectedDate={selectedDate}
@@ -233,8 +241,8 @@ export default function App() {
           selectedTime={selectedTime}
           setToday={setToday}
           setTomorrow={setTomorrow}
-          selectTime={selectTime}
           onChange={onChange}
+          onChangeTime={onChangeTime}
         />
 
         <div className='mt-10 flex gap-x-2'>
@@ -255,7 +263,9 @@ export default function App() {
               selectedDate === null ||
               selectedTime === null ||
               customerName === "" ||
-              customerNumber === ""
+              customerNumber === "" ||
+              selectedBarber === null ||
+              selectedService === null
             }
             onClick={handleSudmit}
             size='large'
