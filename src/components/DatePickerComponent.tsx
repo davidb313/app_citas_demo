@@ -12,9 +12,9 @@ interface DatePickerComponentProps {
   onChangeTime: TimePickerProps["onChange"];
 }
 
-type DisabledTime = (now: Dayjs) => {
-  disabledHours?: () => number[];
-  disabledMinutes?: (selectedHour: number) => number[];
+type DisabledTime = {
+  disabledHours: () => number[];
+  disabledMinutes: (selectedHour: number) => number[];
 };
 
 const format = "HH:mm";
@@ -34,33 +34,42 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
 
   const currentTime = dayjs();
 
-  const disabledTime: DisabledTime = (now) => {
-    const currentHour = now.hour();
-    const currentMinute = now.minute();
+  const disabledTime = (selectedDate: Dayjs): DisabledTime => {
+    if (!selectedDate.isSame(currentTime, "day")) {
+      return {
+        disabledHours: () =>
+          Array.from({ length: 8 }, (_, i) => i).concat(
+            Array.from({ length: 4 }, (_, i) => i + 20)
+          ),
+        disabledMinutes: () => [],
+      };
+    }
 
-    const disableBefore8am = () => {
-      return Array.from({ length: 8 }, (_, i) => i);
-    };
+    const currentHour = currentTime.hour();
+    const currentMinute = currentTime.minute();
 
-    const disableAfter8pm = () => {
-      return Array.from({ length: 24 - 20 }, (_, i) => i + 20);
+    const disableBefore8am = () => Array.from({ length: 8 }, (_, i) => i); // Horas 0-7
+    const disableAfter8pm = () => Array.from({ length: 4 }, (_, i) => i + 20); // Horas 20-23
+
+    const disablePastHours = () => {
+      const hours = [...disableBefore8am(), ...disableAfter8pm()];
+      for (let i = 8; i < 20; i++) {
+        if (i < currentHour) {
+          hours.push(i);
+        }
+      }
+      return hours;
     };
 
     const disablePastMinutes = (selectedHour: number) => {
-      if (selectedHour === 8) {
+      if (selectedHour === currentHour) {
         return Array.from({ length: currentMinute }, (_, i) => i);
       }
       return [];
     };
 
     return {
-      disabledHours: () => {
-        if (currentHour < 8 || currentHour >= 20) {
-          return disableBefore8am().concat(disableAfter8pm());
-        } else {
-          return [];
-        }
-      },
+      disabledHours: disablePastHours,
       disabledMinutes: disablePastMinutes,
     };
   };
@@ -93,9 +102,9 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
       {selectedDate && (
         <>
           <TimePicker
-            disabledTime={() => disabledTime(currentTime)}
+            disabledTime={() => disabledTime(selectedDate)}
+            use12Hours={false}
             className='mt-4 w-full'
-            use12Hours
             allowClear={true}
             minuteStep={15}
             placeholder='Selecciona la hora'
