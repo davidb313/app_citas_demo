@@ -38,18 +38,29 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
     const currentHour = now.hour();
     const currentMinute = now.minute();
 
-    const disablePastHours = () => {
-      return Array.from({ length: currentHour }, (_, i) => i);
+    const disableBefore8am = () => {
+      return Array.from({ length: 8 }, (_, i) => i);
+    };
+
+    const disableAfter8pm = () => {
+      return Array.from({ length: 24 - 20 }, (_, i) => i + 20);
     };
 
     const disablePastMinutes = (selectedHour: number) => {
-      if (selectedHour === currentHour) {
+      if (selectedHour === 8) {
         return Array.from({ length: currentMinute }, (_, i) => i);
       }
       return [];
     };
+
     return {
-      disabledHours: disablePastHours,
+      disabledHours: () => {
+        if (currentHour < 8 || currentHour >= 20) {
+          return disableBefore8am().concat(disableAfter8pm());
+        } else {
+          return [];
+        }
+      },
       disabledMinutes: disablePastMinutes,
     };
   };
