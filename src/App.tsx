@@ -173,7 +173,7 @@ export default function App() {
     messageApi.open({
       type: "error",
       content:
-        "Sucedío un error en la App, comunícate con en el establecimiento",
+        "Ocurrió un error en la App, comunícate con en el establecimiento",
     });
   };
 
@@ -208,7 +208,7 @@ export default function App() {
       <div className='p-5'>
         <div className='flex flex-col items-center'>
           <img height='200' width='200' src={logoBarberia} alt='logo' />
-          <h1 className='text-3xl font-bold'>App de citas para Barbería</h1>
+          <h1 className='text-3xl font-bold'>Citas para Barbería</h1>
         </div>
 
         <div className='mt-10 flex gap-x-2'>
