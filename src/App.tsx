@@ -2,7 +2,6 @@ import "./App.css";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
-import BARBERO from "../src/assets/BARBERO.webp";
 import logoBarberia from "../src/assets/logoBarberia.png";
 import { DatePickerComponent } from "./components/DatePickerComponent";
 import { Button, DatePickerProps, TimePickerProps, message } from "antd";
@@ -11,104 +10,18 @@ import { CustomerData } from "./components/CustomerData";
 import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { client } from "./supabase/client";
-import { Card, CardMedia, Typography } from "@mui/material";
-
-interface CardProps {
-  id: string;
-  name: string;
-  selectedBarber: string | null;
-  setSelectedBarber: React.Dispatch<React.SetStateAction<string | null>>;
-  selectedService: string | null;
-  setSelectedService: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedBarberName: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-const RecipeReviewCard: React.FC<CardProps> = ({
-  id,
-  name,
-  selectedBarber,
-  setSelectedBarber,
-  selectedService,
-  setSelectedService,
-  setSelectedBarberName,
-}) => {
-  const handleServiceClick = (service: string) => {
-    if (selectedBarber === null || selectedBarber === id) {
-      if (selectedService === service && selectedBarber === id) {
-        setSelectedService(null);
-        setSelectedBarber(null);
-        setSelectedBarberName(null);
-      } else {
-        setSelectedService(service);
-        setSelectedBarber(id);
-        setSelectedBarberName(name);
-      }
-    }
-  };
-
-  return (
-    <Card sx={{ maxWidth: "auto", marginTop: 3 }}>
-      <div className='flex'>
-        <CardMedia
-          component='img'
-          sx={{ height: "auto", width: 100, objectFit: "cover" }}
-          image={BARBERO}
-          alt='foto barbero'
-        />
-        <div className='ml-4'>
-          <Typography variant='h6' color='text.primary'>
-            {name}
-          </Typography>
-
-          <div className='mt-2 mb-2'>
-            <Typography variant='body2' color='text.secondary'>
-              Escoge un servicio:
-            </Typography>
-
-            <div className='flex flex-wrap mt-2 gap-2'>
-              <Button
-                type={
-                  selectedService === "corte" && selectedBarber === id
-                    ? "primary"
-                    : "default"
-                }
-                onClick={() => handleServiceClick("corte")}
-                disabled={selectedBarber !== null && selectedBarber !== id}
-                size='small' // Agrega esta línea para hacer el botón más pequeño
-              >
-                Corte de Cabello $20.000
-              </Button>
-              <Button
-                type={
-                  selectedService === "corte_barba" && selectedBarber === id
-                    ? "primary"
-                    : "default"
-                }
-                onClick={() => handleServiceClick("corte_barba")}
-                disabled={selectedBarber !== null && selectedBarber !== id}
-                size='small' // Agrega esta línea para hacer el botón más pequeño
-              >
-                Corte + Barba $23.000
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-};
+import { RecipeReviewCard } from "./components/RecipeReviewCard";
 
 export default function App() {
   //Lista donde se guarda la info de todos los barberos
-  const [allBarbers, setAllBarbers] = useState<any>([]);
+  const [allBarbersFromSupabase, setAllBarbersFromSupabase] = useState<any>([]);
 
   //useState de la informacion de los barberos
-  const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
+  const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedBarberName, setSelectedBarberName] = useState<string | null>(
     null
   );
-
   console.log(selectedBarberName);
 
   //useState del Date y Time Picker
@@ -128,7 +41,7 @@ export default function App() {
     try {
       const response = await client.from("barberos").select();
       if (response.status === 200) {
-        setAllBarbers(response.data);
+        setAllBarbersFromSupabase(response.data);
       }
     } catch (err) {
       error();
@@ -184,22 +97,26 @@ export default function App() {
 
   const handleSudmit = async () => {
     try {
-      const response = await client.from("citas").insert({
-        barbero: selectedBarber,
+      const insertInDataBase = await client.from("citas").insert({
+        barbero: selectedBarberId,
         servicio: selectedService,
         fecha_servicio: selectedDate,
         hora_servicio: selectedTime?.format("HH:mm"),
         nombre_cliente: customerName,
         telefono_cliente: customerNumber,
       });
-      if (response?.status === 200 || response?.status === 201) {
+
+      if (
+        insertInDataBase?.status === 200 ||
+        insertInDataBase?.status === 201
+      ) {
         success();
         setSelectedDate(null);
         setSelectedTime(null);
         setSelectedButton(null);
         setCustomerName("");
         setCustomerNumber("");
-        setSelectedBarber("");
+        setSelectedBarberId("");
         setSelectedService("");
         setSelectedBarberName(null);
       }
@@ -224,13 +141,13 @@ export default function App() {
           </h3>
         </div>
         <div>
-          {allBarbers?.map((barber: any) => (
+          {allBarbersFromSupabase?.map((barber: any) => (
             <RecipeReviewCard
               key={barber?.id}
               id={barber?.id}
               name={barber?.nombre_barbero}
-              selectedBarber={selectedBarber}
-              setSelectedBarber={setSelectedBarber}
+              selectedBarber={selectedBarberId}
+              setSelectedBarber={setSelectedBarberId}
               setSelectedBarberName={setSelectedBarberName}
               selectedService={selectedService}
               setSelectedService={setSelectedService}
@@ -271,7 +188,7 @@ export default function App() {
               selectedTime === null ||
               customerName === "" ||
               customerNumber === "" ||
-              selectedBarber === null ||
+              selectedBarberId === null ||
               selectedService === null
             }
             onClick={handleSudmit}
