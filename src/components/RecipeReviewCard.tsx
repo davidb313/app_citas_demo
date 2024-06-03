@@ -1,86 +1,73 @@
-import { Card, CardMedia, Typography } from "@mui/material";
-import { Button } from "antd";
+import { Card, Typography } from "antd";
 import BARBERO from "../assets/BARBERO.webp";
 
 interface CardProps {
   id: string;
   name: string;
-  selectedBarber: string | null;
-  setSelectedBarber: React.Dispatch<React.SetStateAction<string | null>>;
-  selectedService: string | null;
-  setSelectedService: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedBarberName: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedServiceId: string | null;
+  costo: string | null;
+  setSelectedServiceId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedServiceName: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedServiceCost: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export const RecipeReviewCard: React.FC<CardProps> = ({
   id,
   name,
-  selectedBarber,
-  setSelectedBarber,
-  selectedService,
-  setSelectedService,
-  setSelectedBarberName,
+  selectedServiceId,
+  setSelectedServiceId,
+  setSelectedServiceName,
+  costo,
+  setSelectedServiceCost,
 }) => {
-  const handleServiceClick = (service: string) => {
-    if (selectedBarber === null || selectedBarber === id) {
-      if (selectedService === service && selectedBarber === id) {
-        setSelectedService(null);
-        setSelectedBarber(null);
-        setSelectedBarberName(null);
-      } else {
-        setSelectedService(service);
-        setSelectedBarber(id);
-        setSelectedBarberName(name);
-      }
+  const handleServiceClick = () => {
+    if (selectedServiceId === id) {
+      setSelectedServiceId(null);
+      setSelectedServiceName(null);
+      setSelectedServiceCost(null);
+    } else {
+      setSelectedServiceId(id);
+      setSelectedServiceName(name);
+      setSelectedServiceCost(costo);
     }
   };
 
+  const formattedCosto =
+    costo !== null
+      ? new Intl.NumberFormat("es-CO", {
+          style: "currency",
+          currency: "COP",
+          maximumSignificantDigits: 3,
+        }).format(Number(costo))
+      : "N/A";
+
   return (
-    <Card sx={{ maxWidth: "auto", marginTop: 3 }}>
-      <div className='flex'>
-        <CardMedia
-          component='img'
-          sx={{ height: "auto", width: 100, objectFit: "cover" }}
-          image={BARBERO}
-          alt='foto barbero'
+    <Card
+      size='small'
+      hoverable
+      style={{
+        marginTop: 16,
+        border: selectedServiceId === id ? "2px solid blue" : "",
+        cursor: "pointer",
+      }}
+      onClick={handleServiceClick}
+    >
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          alt='foto servicio'
+          src={BARBERO}
+          style={{
+            height: "auto",
+            width: 100,
+            objectFit: "cover",
+            marginRight: 16,
+          }}
         />
-        <div className='ml-4'>
-          <Typography variant='h6' color='text.primary'>
-            {name}
-          </Typography>
-
-          <div className='mt-2 mb-2'>
-            <Typography variant='body2' color='text.secondary'>
-              Escoge un servicio:
-            </Typography>
-
-            <div className='flex flex-wrap mt-2 gap-2'>
-              <Button
-                type={
-                  selectedService === "corte" && selectedBarber === id
-                    ? "primary"
-                    : "default"
-                }
-                onClick={() => handleServiceClick("corte")}
-                disabled={selectedBarber !== null && selectedBarber !== id}
-                size='small' // Agrega esta línea para hacer el botón más pequeño
-              >
-                Corte de Cabello $20.000
-              </Button>
-              <Button
-                type={
-                  selectedService === "corte_barba" && selectedBarber === id
-                    ? "primary"
-                    : "default"
-                }
-                onClick={() => handleServiceClick("corte_barba")}
-                disabled={selectedBarber !== null && selectedBarber !== id}
-                size='small' // Agrega esta línea para hacer el botón más pequeño
-              >
-                Corte + Barba $23.000
-              </Button>
-            </div>
-          </div>
+        <div>
+          <Typography.Title level={5}>{name}</Typography.Title>
+          <Typography.Text type='secondary'>
+            Costo servicio: {formattedCosto}
+          </Typography.Text>
         </div>
       </div>
     </Card>

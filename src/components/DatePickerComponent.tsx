@@ -92,6 +92,7 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
         <DatePicker
           className='w-screen'
           allowClear={true}
+          format='DD-MM-YYYY'
           disabledDate={disabledDate}
           placeholder='Selecciona otro día'
           value={selectedDate}

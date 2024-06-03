@@ -1,8 +1,6 @@
 import "./App.css";
-import LooksOneIcon from "@mui/icons-material/LooksOne";
-import LooksTwoIcon from "@mui/icons-material/LooksTwo";
-import Looks3Icon from "@mui/icons-material/Looks3";
-import logoBarberia from "../src/assets/logoBarberia.png";
+import logoBarberia from "./assets/logoBarberia.avif";
+
 import { DatePickerComponent } from "./components/DatePickerComponent";
 import { Button, DatePickerProps, TimePickerProps, message } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
@@ -11,19 +9,30 @@ import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { client } from "./supabase/client";
 import { RecipeReviewCard } from "./components/RecipeReviewCard";
+import { Checkout } from "./components/Checkout";
+import { Number1 } from "./assets/icons/Number1";
+import { Number2 } from "./assets/icons/Number2";
+import { Number3 } from "./assets/icons/Number3";
+
 /* import { Login } from "./components/Login";
  */
 export default function App() {
   //Lista donde se guarda la info de todos los barberos
-  const [allBarbersFromSupabase, setAllBarbersFromSupabase] = useState<any>([]);
+  const [allServicesFromSupabase, setAllServicesFromSupabase] = useState<any>(
+    []
+  );
 
   //useState de la informacion de los barberos
-  const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [selectedBarberName, setSelectedBarberName] = useState<string | null>(
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null
   );
-  console.log(selectedBarberName);
+  const [selectedServiceName, setSelectedServiceName] = useState<string | null>(
+    null
+  );
+
+  const [selectedServiceCost, setSelectedServiceCost] = useState<string | null>(
+    null
+  );
 
   //useState del Date y Time Picker
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -40,9 +49,9 @@ export default function App() {
   //Traer a todos los barberos que se crean en Supabase
   const getAllBarbers = async () => {
     try {
-      const response = await client.from("barberos").select();
-      if (response.status === 200) {
-        setAllBarbersFromSupabase(response.data);
+      const response = await client.from("servicios").select();
+      if (response.status === 200 || response.status === 201) {
+        setAllServicesFromSupabase(response?.data);
       }
     } catch (err) {
       error();
@@ -99,8 +108,7 @@ export default function App() {
   const handleSudmit = async () => {
     try {
       const insertInDataBase = await client.from("citas").insert({
-        barbero: selectedBarberId,
-        servicio: selectedService,
+        servicio_solicitado: selectedServiceId,
         fecha_servicio: selectedDate,
         hora_servicio: selectedTime?.format("HH:mm"),
         nombre_cliente: customerName,
@@ -117,9 +125,9 @@ export default function App() {
         setSelectedButton(null);
         setCustomerName("");
         setCustomerNumber("");
-        setSelectedBarberId("");
-        setSelectedService("");
-        setSelectedBarberName(null);
+        setSelectedServiceId("");
+        setSelectedServiceName("");
+        setSelectedServiceCost(null);
       }
     } catch (err) {
       error();
@@ -131,38 +139,32 @@ export default function App() {
       {contextHolder}
 
       <div className='p-5'>
-        {/* <p className='mb-2 font-thin'>
-          Para agendarte debes ingresar con tu email:
-        </p> */}
-        {/* <Login /> */}
         <div className='flex flex-col items-center'>
-          <img height='200' width='200' src={logoBarberia} alt='logo' />
-          <h1 className='text-3xl font-bold'>Citas para Barbería</h1>
+          <img height='150' width='150' src={logoBarberia} alt='logo' />
+          <h1 className='mt-2 text-2xl font-bold'>Citas para Barbería</h1>
         </div>
 
         <div className='mt-10 flex gap-x-2'>
-          <LooksOneIcon />
-          <h3 className='font-bold'>
-            Selecciona el servicio de tu barbero favorito
-          </h3>
+          <Number1 />
+          <h3 className='font-bold'>Selecciona el servicio que deseas</h3>
         </div>
         <div>
-          {allBarbersFromSupabase?.map((barber: any) => (
+          {allServicesFromSupabase?.map((service: any) => (
             <RecipeReviewCard
-              key={barber?.id}
-              id={barber?.id}
-              name={barber?.nombre_barbero}
-              selectedBarber={selectedBarberId}
-              setSelectedBarber={setSelectedBarberId}
-              setSelectedBarberName={setSelectedBarberName}
-              selectedService={selectedService}
-              setSelectedService={setSelectedService}
+              key={service?.id}
+              id={service?.id}
+              name={service?.nombre_servicio}
+              costo={service?.costo}
+              setSelectedServiceCost={setSelectedServiceCost}
+              selectedServiceId={selectedServiceId}
+              setSelectedServiceId={setSelectedServiceId}
+              setSelectedServiceName={setSelectedServiceName}
             />
           ))}
         </div>
 
         <div className='mt-10 flex gap-x-2'>
-          <LooksTwoIcon />
+          <Number2 />
           <h3 className='font-bold'>Selecciona el día y la hora</h3>
         </div>
         <DatePickerComponent
@@ -176,8 +178,8 @@ export default function App() {
         />
 
         <div className='mt-10 flex gap-x-2'>
-          <Looks3Icon />
-          <h3 className='font-bold'>Ingresa tus datos</h3>
+          <Number3 />
+          <h3 className='font-bold'>Datos de contacto</h3>
         </div>
         <CustomerData
           customerName={customerName}
@@ -186,16 +188,25 @@ export default function App() {
           setCustomerNumber={setCustomerNumber}
         />
 
-        <div className='p-10 flex justify-center'>
+        <div className='mt-10 flex gap-x-2'></div>
+        <Checkout
+          selectedServiceName={selectedServiceName}
+          selectedServiceCost={selectedServiceCost}
+          selectedDate={selectedDate}
+          selectedTime={selectedTime}
+          customerName={customerName}
+          customerNumber={customerNumber}
+        />
+
+        <div className='p-7 flex justify-center'>
           <Button
             type='primary'
             disabled={
+              selectedServiceId === null ||
               selectedDate === null ||
               selectedTime === null ||
               customerName === "" ||
-              customerNumber === "" ||
-              selectedBarberId === null ||
-              selectedService === null
+              customerNumber === ""
             }
             onClick={handleSudmit}
             size='large'
