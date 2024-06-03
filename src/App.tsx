@@ -13,6 +13,7 @@ import { Checkout } from "./components/Checkout";
 import { Number1 } from "./assets/icons/Number1";
 import { Number2 } from "./assets/icons/Number2";
 import { Number3 } from "./assets/icons/Number3";
+import { WhatsAppLogo } from "./assets/icons/WhatsAppLogo";
 
 /* import { Login } from "./components/Login";
  */
@@ -141,7 +142,24 @@ export default function App() {
       <div className='p-5'>
         <div className='flex flex-col items-center'>
           <img height='150' width='150' src={logoBarberia} alt='logo' />
-          <h1 className='mt-2 text-2xl font-bold'>Citas para Barbería</h1>
+          <h1 className='mt-2 text-2xl font-bold'>Citas [nombre de negocio]</h1>
+          <p className='mt-2 text-sm'>
+            Para cancelar o reprogramar una cita agendada, comunícate con
+            nosotros
+            <a
+              href='https://api.whatsapp.com/send?phone=573045528606'
+              style={{ marginLeft: 4 }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  verticalAlign: "middle",
+                }}
+              >
+                <WhatsAppLogo />
+              </span>
+            </a>
+          </p>
         </div>
 
         <div className='mt-10 flex gap-x-2'>
