@@ -200,6 +200,7 @@ export default function App() {
 
         <div className='p-7 flex justify-center'>
           <Button
+            style={{ width: "100%" }}
             type='primary'
             disabled={
               selectedServiceId === null ||
