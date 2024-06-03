@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { client } from "./supabase/client";
 import { RecipeReviewCard } from "./components/RecipeReviewCard";
-
+/* import { Login } from "./components/Login";
+ */
 export default function App() {
   //Lista donde se guarda la info de todos los barberos
   const [allBarbersFromSupabase, setAllBarbersFromSupabase] = useState<any>([]);
@@ -128,7 +129,12 @@ export default function App() {
   return (
     <>
       {contextHolder}
+
       <div className='p-5'>
+        {/* <p className='mb-2 font-thin'>
+          Para agendarte debes ingresar con tu email:
+        </p> */}
+        {/* <Login /> */}
         <div className='flex flex-col items-center'>
           <img height='200' width='200' src={logoBarberia} alt='logo' />
           <h1 className='text-3xl font-bold'>Citas para Barbería</h1>
