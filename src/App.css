@@ -28,6 +28,11 @@
   color: #61dafb;
 }
 
+
+.ant-picker-content {
+  height: calc(100vh - 300px);
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
