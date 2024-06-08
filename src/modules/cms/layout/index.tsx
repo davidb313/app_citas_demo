@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
+  CalendarOutlined,
+  OrderedListOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -20,7 +19,8 @@ const LayoutCms: React.FC = () => {
   const navigate = useNavigate();
 
   const routeMap: RouteMap = {
-    "1": "/app/appointment",
+    "0": "/app/appointment",
+    "1": "/app/services",
   };
 
   const [collapsed, setCollapsed] = useState(false);
@@ -40,17 +40,22 @@ const LayoutCms: React.FC = () => {
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="demo-logo-vertical" />
+        <div className='demo-logo-vertical' />
         <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
+          theme='dark'
+          mode='inline'
+          defaultSelectedKeys={["0"]}
           onClick={handleMenuClick}
           items={[
             {
-              key: "1",
-              icon: <UserOutlined />,
+              key: "0",
+              icon: <CalendarOutlined />,
               label: "Calendario",
+            },
+            {
+              key: "1",
+              icon: <OrderedListOutlined />,
+              label: "Servicios",
             },
           ]}
         />
@@ -58,7 +63,7 @@ const LayoutCms: React.FC = () => {
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
           <Button
-            type="text"
+            type='text'
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
