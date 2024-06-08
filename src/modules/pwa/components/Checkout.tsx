@@ -32,7 +32,7 @@ export const Checkout: React.FC<CardProps> = ({
         Servicio: {selectedServiceName}
       </Typography>
       <Typography color='text.secondary'>
-        Costo servicio: {formattedCosto}
+        Valor servicio: {formattedCosto}
       </Typography>
       <Typography color='text.secondary'>
         Fecha y Hora: {selectedDate ? selectedDate.format("DD-MM-YYYY") : ""}{" "}
