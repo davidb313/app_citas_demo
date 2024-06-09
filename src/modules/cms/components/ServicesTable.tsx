@@ -1,17 +1,20 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import type { GetRef, InputRef } from "antd";
-import { Button, Form, Input, Popconfirm, Table } from "antd";
+import { Button, Form, Input, Popconfirm, Table, Switch } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
+import { useServices } from "../../../hooks/useServices";
+import { client } from "../../../supabase/client";
+import { useMessages } from "../../../hooks/useMessages";
 
 type FormInstance<T> = GetRef<typeof Form<T>>;
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
 interface Item {
-  key: string;
-  name: string;
-  age: string;
-  address: string;
+  id?: string;
+  nombre_servicio: string;
+  costo: string;
+  estado: string;
 }
 
 interface EditableRowProps {
@@ -105,29 +108,86 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 type EditableTableProps = Parameters<typeof Table>[0];
 
 interface DataType {
-  key: React.Key;
-  name: string;
-  valor: number;
+  id?: string;
+  nombre_servicio: string;
+  costo: number;
   estado: boolean;
 }
 
 type ColumnTypes = Exclude<EditableTableProps["columns"], undefined>;
 
 export const ServicesTable: React.FC = () => {
-  const [dataSource, setDataSource] = useState<DataType[]>([
-    {
-      key: "0",
-      name: "Servicio 1",
-      valor: 20000,
+  const { allServices, setAllServices } = useServices();
+  const { showSuccess, showError, contextHolder } = useMessages();
+
+  const handleAdd = async () => {
+    const newData: Omit<DataType, "id"> = {
+      nombre_servicio: `Servicio ${allServices.length + 1}`,
+      costo: 20000,
       estado: true,
-    },
-  ]);
+    };
+    try {
+      const response = await client.from("servicios").insert([newData]);
+      if (response.status === 201 || response.status === 200) {
+        setAllServices([...allServices, { ...newData }]);
+        showSuccess("Servicio agregado exitosamente");
+      } else {
+        showError(
+          "Error al agregar el servicio, comunícate con en el proveedor del software"
+        );
+      }
+    } catch (error) {
+      showError(
+        "Ocurrió un error en la App, comunícate con en el proveedor del software"
+      );
+    }
+  };
 
-  const [count, setCount] = useState(2);
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await client
+        .from("servicios")
+        .delete()
+        .eq("id", id)
+        .single();
+      if (response.status === 200 || response.status === 204) {
+        const newData = allServices.filter((item: DataType) => item.id !== id);
+        setAllServices(newData);
+        showSuccess("Servicio eliminado exitosamente");
+      } else {
+        showError("Error al eliminar el servicio");
+      }
+    } catch (error) {
+      showError(
+        "Ocurrió un error en la App, comunícate con en el proveedor del software"
+      );
+    }
+  };
 
-  const handleDelete = (key: React.Key) => {
-    const newData = dataSource.filter((item) => item.key !== key);
-    setDataSource(newData);
+  const handleSave = async (row: DataType) => {
+    try {
+      const newData = [...allServices];
+      const index = newData.findIndex((item) => row.id === item.id);
+      if (index > -1) {
+        const item = newData[index];
+        const updatedData = { ...item, ...row };
+        const response = await client
+          .from("servicios")
+          .update(updatedData)
+          .eq("id", row.id);
+        if (response.status === 200 || response.status === 204) {
+          newData.splice(index, 1, updatedData);
+          setAllServices(newData);
+          showSuccess("Servicio actualizado exitosamente");
+        } else {
+          showError("Error al actualizar el servicio");
+        }
+      }
+    } catch (error) {
+      showError(
+        "Ocurrió un error en la App, comunícate con en el proveedor del software"
+      );
+    }
   };
 
   const defaultColumns: (ColumnTypes[number] & {
@@ -136,28 +196,28 @@ export const ServicesTable: React.FC = () => {
   })[] = [
     {
       title: "Nombre del servicio",
-      dataIndex: "name",
+      dataIndex: "nombre_servicio",
       width: "30%",
       editable: true,
     },
     {
       title: "Valor",
-      dataIndex: "valor",
+      dataIndex: "costo",
       editable: true,
     },
     {
-      title: "Estado",
+      title: "Activo",
       dataIndex: "estado",
-      editable: true,
+      render: (_, record) => <Switch checked={record.estado} />,
     },
     {
       title: "Operación",
       dataIndex: "operation",
       render: (_, record) =>
-        dataSource.length >= 1 ? (
+        allServices.length >= 1 ? (
           <Popconfirm
             title='¿Eliminar servicio?'
-            onConfirm={() => handleDelete(record.key)}
+            onConfirm={() => handleDelete(record.id!)}
           >
             <Button
               danger
@@ -167,33 +227,11 @@ export const ServicesTable: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            ></Button>
+            />
           </Popconfirm>
         ) : null,
     },
   ];
-
-  const handleAdd = () => {
-    const newData: DataType = {
-      key: count,
-      name: `Servicio ${count}`,
-      valor: 20000,
-      estado: true,
-    };
-    setDataSource([...dataSource, newData]);
-    setCount(count + 1);
-  };
-
-  const handleSave = (row: DataType) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setDataSource(newData);
-  };
 
   const components = {
     body: {
@@ -220,6 +258,7 @@ export const ServicesTable: React.FC = () => {
 
   return (
     <div>
+      {contextHolder}
       <Button onClick={handleAdd} type='primary' style={{ marginBottom: 16 }}>
         Agregar servicio
       </Button>
@@ -227,7 +266,10 @@ export const ServicesTable: React.FC = () => {
         components={components}
         rowClassName={() => "editable-row"}
         bordered
-        dataSource={dataSource}
+        dataSource={allServices.map((service: Item) => ({
+          ...service,
+          key: service.id,
+        }))}
         columns={columns as ColumnTypes}
         pagination={{ pageSize: 5 }}
       />

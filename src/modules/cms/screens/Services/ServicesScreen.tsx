@@ -1,6 +1,6 @@
 import { ServicesTable } from "../../components/ServicesTable";
 
-const ServicesScreen = () => {
+export const ServicesScreen = () => {
   return (
     <div>
       <ServicesTable />

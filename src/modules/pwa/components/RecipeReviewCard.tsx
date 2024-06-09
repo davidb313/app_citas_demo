@@ -66,7 +66,7 @@ export const RecipeReviewCard: React.FC<CardProps> = ({
         <div>
           <Typography.Title level={5}>{name}</Typography.Title>
           <Typography.Text type='secondary'>
-            Costo servicio: {formattedCosto}
+            Valor servicio: {formattedCosto}
           </Typography.Text>
         </div>
       </div>
