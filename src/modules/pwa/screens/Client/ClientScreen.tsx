@@ -10,7 +10,7 @@ import { Number2 } from "../../assets/icons/Number2";
 import { Number3 } from "../../assets/icons/Number3";
 import { RecipeReviewCard } from "../../components/RecipeReviewCard";
 import { useState } from "react";
-import { WhatsAppLogo } from "../../assets/icons/WhatsAppLogo";
+import { WhatsAppOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import logoBarberia from "../../assets/logoBarberia.avif";
 import { useServices } from "../../../../hooks/useServices";
@@ -112,7 +112,9 @@ export default function ClientScreen() {
             nosotros
             <a
               href='https://api.whatsapp.com/send?phone=573045528606'
-              style={{ marginLeft: 4 }}
+              style={{ marginLeft: 5 }}
+              target='_blank'
+              rel='noopener noreferrer'
             >
               <span
                 style={{
@@ -120,7 +122,7 @@ export default function ClientScreen() {
                   verticalAlign: "middle",
                 }}
               >
-                <WhatsAppLogo />
+                <WhatsAppOutlined style={{ fontSize: "20px" }} />
               </span>
             </a>
           </p>
