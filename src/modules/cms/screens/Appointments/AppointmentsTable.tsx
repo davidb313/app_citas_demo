@@ -10,6 +10,7 @@ interface DataType {
   hora_servicio: string;
   nombre_cliente: string;
   telefono_cliente: string;
+  comentarios: string;
 }
 
 const columns: TableColumnsType<DataType> = [
@@ -32,6 +33,16 @@ const columns: TableColumnsType<DataType> = [
   {
     title: "Teléfono del cliente",
     dataIndex: "telefono_cliente",
+  },
+  {
+    title: "Comentarios del cliente",
+    dataIndex: "comentarios",
+    width: 100,
+    render: (text) => (
+      <div style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
+        {text}
+      </div>
+    ),
   },
 ];
 

@@ -16,6 +16,7 @@ export const useAppointments = () => {
           hora_servicio,
           nombre_cliente,
           telefono_cliente,
+          comentarios,
           servicio_solicitado (
             id,
             nombre_servicio

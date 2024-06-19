@@ -1,5 +1,6 @@
 import { Input } from "antd";
 import { UserOutlined, WhatsAppOutlined } from "@ant-design/icons";
+import TextArea from "antd/es/input/TextArea";
 
 interface CustomerDataProps {
   customerName: string;
@@ -18,6 +19,15 @@ export const CustomerData: React.FC<CustomerDataProps> = ({
   customerComments,
   setCustomerComments,
 }) => {
+  const handleChange = (e: any) => {
+    const { value } = e.target;
+    if (value.length <= 50) {
+      setCustomerComments(value);
+    } else {
+      setCustomerComments(value.slice(0, 50));
+    }
+  };
+
   return (
     <div className='mt-6 space-y-4'>
       <Input
@@ -35,13 +45,12 @@ export const CustomerData: React.FC<CustomerDataProps> = ({
         placeholder='Tu teléfono'
         prefix={<WhatsAppOutlined />}
       />
-      <Input
+      <TextArea
+        placeholder='Puedes añadir un comentario de máx. 50 caracteres, por ejemplo: Agendar con el Barbero Juan...'
+        autoSize
+        maxLength={50}
+        onChange={handleChange}
         value={customerComments}
-        type='string'
-        onChange={(e) => setCustomerComments(e.target.value)}
-        size='large'
-        placeholder='Algún comentario adicional?'
-        prefix={<WhatsAppOutlined />}
       />
     </div>
   );

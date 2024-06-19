@@ -74,6 +74,7 @@ export default function ClientScreen() {
         hora_servicio: selectedTime?.format("HH:mm"),
         nombre_cliente: customerName,
         telefono_cliente: customerNumber,
+        comentarios: customerComments,
       });
 
       if (
@@ -89,6 +90,7 @@ export default function ClientScreen() {
         setSelectedServiceId("");
         setSelectedServiceName("");
         setSelectedServiceCost(null);
+        setCustomerComments("");
       }
     } catch (err) {
       showError(
