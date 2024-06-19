@@ -37,7 +37,7 @@ const columns: TableColumnsType<DataType> = [
   {
     title: "Comentarios del cliente",
     dataIndex: "comentarios",
-    width: 100,
+    width: 200,
     render: (text) => (
       <div style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
         {text}

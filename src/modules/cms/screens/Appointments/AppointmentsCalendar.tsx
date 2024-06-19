@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { BadgeProps, CalendarProps } from "antd";
 import { Badge, Calendar, Modal, List } from "antd";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs"; // Importa dayjs
 import { useAppointments } from "../../../../hooks/useAppointments";
 import { WhatsAppOutlined } from "@ant-design/icons";
 
@@ -24,7 +25,10 @@ const AppointmentsCalendar: React.FC = () => {
       })
       .map((appointment: any) => ({
         type: "success",
-        content: `${appointment.nombre_cliente} - ${appointment.hora_servicio} - ${appointment.servicio_solicitado}`,
+        content: `${appointment.nombre_cliente} - ${dayjs(
+          appointment.hora_servicio,
+          "HH:mm:ss"
+        ).format("HH:mm")} - ${appointment.servicio_solicitado}`,
         ...appointment,
       }));
     return listData;
@@ -94,7 +98,10 @@ const AppointmentsCalendar: React.FC = () => {
           renderItem={(appointment: any) => (
             <List.Item>
               <List.Item.Meta
-                title={`${appointment.nombre_cliente} - ${appointment.hora_servicio}`}
+                title={`${appointment.nombre_cliente} - ${dayjs(
+                  appointment.hora_servicio,
+                  "HH:mm:ss"
+                ).format("HH:mm")}`}
                 description={
                   <>
                     <div>Servicio: {appointment.servicio_solicitado}</div>
