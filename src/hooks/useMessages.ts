@@ -18,5 +18,12 @@ export const useMessages = () => {
     });
   };
 
-  return { showSuccess, showError, contextHolder };
+  const showInfo = (content: string) => {
+    messageApi.open({
+      type: "info",
+      content,
+    });
+  };
+
+  return { showSuccess, showError, showInfo, contextHolder };
 };

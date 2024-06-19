@@ -40,11 +40,11 @@ const getMonthData = (value: Dayjs) => {
   }
 };
 
-const AppointmentScreen: React.FC = () => {
+const AppointmentsCalendar: React.FC = () => {
   const monthCellRender = (value: Dayjs) => {
     const num = getMonthData(value);
     return num ? (
-      <div className="notes-month">
+      <div className='notes-month'>
         <section>{num}</section>
         <span>Backlog number</span>
       </div>
@@ -54,7 +54,7 @@ const AppointmentScreen: React.FC = () => {
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value);
     return (
-      <ul className="events">
+      <ul className='events'>
         {listData.map((item) => (
           <li key={item.content}>
             <Badge
@@ -76,4 +76,4 @@ const AppointmentScreen: React.FC = () => {
   return <Calendar fullscreen cellRender={cellRender} />;
 };
 
-export default AppointmentScreen;
+export default AppointmentsCalendar;
