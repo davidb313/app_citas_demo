@@ -37,11 +37,17 @@ const columns: TableColumnsType<DataType> = [
 
 const AppointmentsTable: React.FC = () => {
   const { allAppointments } = useAppointments();
-  console.log(allAppointments);
 
   return (
     <>
-      <Table columns={columns} dataSource={allAppointments} size='small' />
+      <Table
+        columns={columns}
+        dataSource={allAppointments.map((appointment: any) => ({
+          ...appointment,
+          key: appointment.id,
+        }))}
+        size='small'
+      />
     </>
   );
 };

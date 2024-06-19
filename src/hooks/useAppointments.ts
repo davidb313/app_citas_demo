@@ -9,13 +9,29 @@ export const useAppointments = () => {
   useEffect(() => {
     const getAllServices = async () => {
       try {
-        const response = await client.from("citas").select();
+        const response = await client.from("citas").select(`
+          id,
+          created_at,
+          fecha_servicio,
+          hora_servicio,
+          nombre_cliente,
+          telefono_cliente,
+          servicio_solicitado (
+            id,
+            nombre_servicio
+          )
+        `);
         if (response.status === 200 || response.status === 201) {
-          setAllAppointments(response?.data);
+          const data = response?.data?.map((appointment: any) => ({
+            ...appointment,
+            servicio_solicitado:
+              appointment.servicio_solicitado.nombre_servicio,
+          }));
+          setAllAppointments(data);
         }
       } catch (err) {
         showError(
-          "No se pudieron cargar los servicios, contacte al proveedor del software"
+          "No se pudieron cargar los citas, contacte al proveedor del software"
         );
       }
     };

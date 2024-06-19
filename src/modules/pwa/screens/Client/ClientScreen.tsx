@@ -40,6 +40,7 @@ export default function ClientScreen() {
   //useState de la info del cliente que toma el servicio
   const [customerName, setCustomerName] = useState("");
   const [customerNumber, setCustomerNumber] = useState("");
+  const [customerComments, setCustomerComments] = useState("");
 
   //Logica del Date y Time Picker
   const onChange: DatePickerProps["onChange"] = (date) => {
@@ -165,6 +166,8 @@ export default function ClientScreen() {
           setCustomerName={setCustomerName}
           customerNumber={customerNumber}
           setCustomerNumber={setCustomerNumber}
+          customerComments={customerComments}
+          setCustomerComments={setCustomerComments}
         />
 
         <div className='mt-10 flex gap-x-2'></div>
@@ -175,6 +178,7 @@ export default function ClientScreen() {
           selectedTime={selectedTime}
           customerName={customerName}
           customerNumber={customerNumber}
+          customerComments={customerComments}
         />
 
         <div className='p-7 flex justify-center'>

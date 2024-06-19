@@ -8,6 +8,7 @@ interface CardProps {
   selectedTime: Dayjs | null;
   customerName: string | null;
   customerNumber: string | null;
+  customerComments: string | null;
 }
 
 export const Checkout: React.FC<CardProps> = ({
@@ -17,6 +18,7 @@ export const Checkout: React.FC<CardProps> = ({
   selectedTime,
   customerName,
   customerNumber,
+  customerComments,
 }) => {
   const formattedCosto =
     selectedServiceCost !== null
@@ -41,6 +43,9 @@ export const Checkout: React.FC<CardProps> = ({
       <Typography color='text.secondary'>Cliente: {customerName}</Typography>
       <Typography color='text.secondary'>
         Número de teléfono: {customerNumber}
+      </Typography>
+      <Typography color='text.secondary'>
+        Comentarios: {customerComments}
       </Typography>
     </Card>
   );
