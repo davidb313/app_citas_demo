@@ -25,6 +25,7 @@ export const useAppointments = () => {
         if (response.status === 200 || response.status === 201) {
           const data = response?.data?.map((appointment: any) => ({
             ...appointment,
+            servicio_solicitado_id: appointment.servicio_solicitado.id,
             servicio_solicitado:
               appointment.servicio_solicitado.nombre_servicio,
           }));

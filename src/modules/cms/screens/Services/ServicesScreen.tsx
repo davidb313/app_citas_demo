@@ -222,23 +222,7 @@ const ServicesScreen: React.FC = () => {
     dataIndex: string;
   })[] = [
     {
-      title: "Nombre del servicio",
-      dataIndex: "nombre_servicio",
-      width: "30%",
-      editable: true,
-    },
-    {
-      title: "Valor",
-      dataIndex: "costo",
-      editable: true,
-    },
-    {
-      title: "Activo",
-      dataIndex: "estado",
-      render: (_, record) => <Switch checked={record.estado} />,
-    },
-    {
-      title: "Operación",
+      title: "Acciones",
       dataIndex: "operation",
       render: (_, record) =>
         allServices.length >= 1 ? (
@@ -257,6 +241,22 @@ const ServicesScreen: React.FC = () => {
             />
           </Popconfirm>
         ) : null,
+    },
+    {
+      title: "Nombre del servicio",
+      dataIndex: "nombre_servicio",
+      width: "30%",
+      editable: true,
+    },
+    {
+      title: "Valor",
+      dataIndex: "costo",
+      editable: true,
+    },
+    {
+      title: "Activo",
+      dataIndex: "estado",
+      render: (_, record) => <Switch checked={record.estado} />,
     },
   ];
 
@@ -287,7 +287,7 @@ const ServicesScreen: React.FC = () => {
     <div>
       {contextHolder}
       <Button onClick={handleAdd} type='primary' style={{ marginBottom: 16 }}>
-        Agregar servicio
+        Crear servicio
       </Button>
       <Table
         components={components}
