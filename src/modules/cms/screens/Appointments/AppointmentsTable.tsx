@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import utc from "dayjs/plugin/utc";
 import { useAppointments } from "../../../../hooks/useAppointments";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { client } from "../../../../supabase/client";
 import { useMessages } from "../../../../hooks/useMessages";
 import { useServices } from "../../../../hooks/useServices";
@@ -81,14 +81,14 @@ const AppointmentsTable: React.FC = () => {
       fecha_servicio: dayjs(appointment.fecha_servicio),
       hora_servicio: dayjs(appointment.hora_servicio, "HH:mm"),
     });
-    setIsAddingNew(false); // Set editing mode
+    setIsAddingNew(false);
     setIsModalVisible(true);
   };
 
   const handleAddNew = () => {
     setCurrentAppointment(null);
-    form.resetFields(); // Clear form fields
-    setIsAddingNew(true); // Set adding new mode
+    form.resetFields();
+    setIsAddingNew(true);
     setIsModalVisible(true);
   };
 
@@ -139,7 +139,6 @@ const AppointmentsTable: React.FC = () => {
 
       if (isAddingNew) {
         const response = await client.from("citas").insert([formattedValues]);
-        console.log(response);
 
         if (response.status === 201) {
           const insertedAppointment: any = response.data?.[0];
@@ -282,6 +281,7 @@ const AppointmentsTable: React.FC = () => {
           key: appointment?.id,
         }))}
         size='small'
+        pagination={{ pageSize: 10 }}
       />
       <Modal
         title={isAddingNew ? "Agregar Cita" : "Editar Cita"}
