@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Form, Input, Popconfirm, Table, Modal, Switch } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Spin } from "antd";
 import { client } from "../../../../supabase/client";
 import { useMessages } from "../../../../hooks/useMessages";
 import type { TableColumnsType } from "antd";
 import { useServices } from "../../../../hooks/useServices";
+import {
+  deleteService,
+  getServices,
+  insertService,
+  updateService,
+} from "../../api/services/service.service";
+import { Spinner } from "../../../../components";
 
 interface DataType {
   key: React.Key;
@@ -18,30 +26,30 @@ const ServicesScreen: React.FC = () => {
   const { showSuccess, showError, showInfo, contextHolder } = useMessages();
   const [currentService, setCurrentService] = useState<DataType | null>(null);
   const [allServices, setAllServices] = useState<any>([]);
-  const [saved, setSaved] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    getAllServices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [saved]);
-
-  const getAllServices = async () => {
+  const getAllServices = useCallback(async () => {
     try {
-      const response = await client.from("servicios").select();
-      if (response.status === 200 || response.status === 201) {
-        setAllServices(response?.data);
-        setSaved(true);
-      }
+      setIsLoading(true);
+      const response = await getServices();
+      setAllServices(response ? response : []);
+      // setSaved(true);
+      setIsLoading(false);
     } catch (err) {
       showError(
         "No se pudieron cargar los servicios, contacte al proveedor del software"
       );
+      setIsLoading(false);
     }
-  };
+  }, [showError]);
+
+  useEffect(() => {
+    getAllServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleEdit = (service: DataType) => {
     setCurrentService(service);
@@ -55,15 +63,8 @@ const ServicesScreen: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await client
-        .from("servicios")
-        .delete()
-        .eq("id", id)
-        .single();
-
-      if (response.status === 200 || response.status === 204) {
-        const newData = allServices?.filter((item: DataType) => item.id !== id);
-        setAllServices(newData);
+      const response = await deleteService(id);
+      if (response) {
         showSuccess("Servicio eliminado exitosamente");
       } else {
         showInfo("Por favor intente eliminar este servicio en unos segundos");
@@ -109,49 +110,21 @@ const ServicesScreen: React.FC = () => {
       }
 
       if (isAddingNew) {
-        const response = await client
-          .from("servicios")
-          .insert([formattedValues]);
-        if (response.status === 201) {
-          const insertedService: any = response.data?.[0];
-          setAllServices((prevServices: DataType[]) => [
-            ...prevServices,
-            { ...formattedValues, id: insertedService?.id },
-          ]);
-          showSuccess("Servicio agregado exitosamente");
-        } else {
-          if (currentService) {
-            const response = await client
-              .from("servicios")
-              .update(updatedFields)
-              .eq("id", currentService.id);
-
-            if (
-              response.status === 200 ||
-              response.status === 204 ||
-              response.status === 201
-            ) {
-              const updatedService = {
-                ...currentService,
-                ...updatedFields,
-              };
-              setAllServices((prevServices: DataType[]) =>
-                prevServices.map((item: DataType) =>
-                  item.id === currentService.id ? updatedService : item
-                )
-              );
-              showSuccess("Servicio actualizado exitosamente");
-            } else {
-              showInfo(
-                "Por favor intente actualizar este servicio nuevamente en unos segundos"
-              );
-            }
-          }
-        }
-
-        setIsModalVisible(false);
-        setCurrentService(null);
+        // Insert
+        const response = await insertService(formattedValues);
+        if (response) showSuccess("Servicio agregado exitosamente");
+      } else {
+        // update
+        const response = await updateService(
+          updatedFields,
+          currentService?.id ?? ""
+        );
+        if (response) showSuccess("Servicio actualizado exitosamente");
       }
+      await getAllServices();
+
+      setIsModalVisible(false);
+      setCurrentService(null);
     } catch (error) {
       showError(
         "Ocurrió un error en la App, comunícate con el proveedor del software"
@@ -171,9 +144,9 @@ const ServicesScreen: React.FC = () => {
       dataIndex: "operation",
       render: (_, record) =>
         allServices.length >= 1 ? (
-          <div className='flex gap-x-3'>
+          <div className="flex gap-x-3">
             <Popconfirm
-              title='¿Eliminar servicio?'
+              title="¿Eliminar servicio?"
               onConfirm={() => handleDelete(record.id!)}
             >
               <Button
@@ -216,62 +189,70 @@ const ServicesScreen: React.FC = () => {
 
   return (
     <div>
-      {contextHolder}
-      <Button
-        onClick={handleAddNew}
-        type='primary'
-        style={{ marginBottom: 16 }}
-      >
-        Crear servicio
-      </Button>
-      <Table
-        columns={columns}
-        dataSource={allServices.map((service: DataType) => ({
-          ...service,
-          key: service?.id,
-        }))}
-        size='small'
-        pagination={{ pageSize: 5 }}
-      />
-      <Modal
-        title={isAddingNew ? "Agregar servicio" : "Editar servicio"}
-        visible={isModalVisible} // Cambiado de open a visible
-        onOk={handleSave}
-        onCancel={handleCancel}
-      >
-        <Form form={form} layout='vertical'>
-          <Form.Item
-            name='nombre_servicio'
-            label='Nombre del servicio'
-            rules={[
-              {
-                required: true,
-                message: "Por favor ingrese el nombre del servicio",
-              },
-            ]}
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <div>
+          {contextHolder}
+          <Button
+            onClick={handleAddNew}
+            type="primary"
+            style={{ marginBottom: 16 }}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name='costo'
-            label='Valor del servicio'
-            rules={[
-              {
-                required: true,
-                message: "Por favor ingrese el valor del servicio",
-              },
-            ]}
+            Crear servicio
+          </Button>
+
+          <Table
+            columns={columns}
+            dataSource={allServices.map((service: DataType) => ({
+              ...service,
+              key: service?.id,
+            }))}
+            size="small"
+            pagination={{ pageSize: 5 }}
+          />
+          <Modal
+            title={isAddingNew ? "Agregar servicio" : "Editar servicio"}
+            visible={isModalVisible} // Cambiado de open a visible
+            onOk={handleSave}
+            onCancel={handleCancel}
           >
-            <Input type='number' step='any' />
-          </Form.Item>
-          <Form.Item name='estado' label='Estado del servicio'>
-            <Switch
-              checked={form.getFieldValue("estado")}
-              onChange={(checked) => form.setFieldsValue({ estado: checked })}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form form={form} layout="vertical">
+              <Form.Item
+                name="nombre_servicio"
+                label="Nombre del servicio"
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingrese el nombre del servicio",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="costo"
+                label="Valor del servicio"
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingrese el valor del servicio",
+                  },
+                ]}
+              >
+                <Input type="number" step="any" />
+              </Form.Item>
+              <Form.Item name="estado" label="Estado del servicio">
+                <Switch
+                  onChange={(checked) =>
+                    form.setFieldsValue({ estado: checked })
+                  }
+                />
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      )}
     </div>
   );
 };
