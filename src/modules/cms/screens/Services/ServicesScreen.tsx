@@ -66,6 +66,7 @@ const ServicesScreen: React.FC = () => {
       const response = await deleteService(id);
       if (response) {
         showSuccess("Servicio eliminado exitosamente");
+        await getAllServices();
       } else {
         showInfo("Por favor intente eliminar este servicio en unos segundos");
       }
