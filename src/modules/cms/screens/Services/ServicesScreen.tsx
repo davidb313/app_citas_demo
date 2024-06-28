@@ -33,7 +33,6 @@ const ServicesScreen: React.FC = () => {
       setIsLoading(true);
       const response = await getServices();
       setAllServices(response ? response : []);
-      // setSaved(true);
       setIsLoading(false);
     } catch (err) {
       showError(
@@ -211,7 +210,7 @@ const ServicesScreen: React.FC = () => {
           />
           <Modal
             title={isAddingNew ? "Agregar servicio" : "Editar servicio"}
-            visible={isModalVisible} // Cambiado de open a visible
+            open={isModalVisible}
             onOk={handleSave}
             onCancel={handleCancel}
           >
