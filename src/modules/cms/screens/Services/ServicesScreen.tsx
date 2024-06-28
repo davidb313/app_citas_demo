@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Form, Input, Popconfirm, Table, Modal, Switch } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { client } from "../../../../supabase/client";
@@ -15,13 +15,33 @@ interface DataType {
 }
 
 const ServicesScreen: React.FC = () => {
-  const { allServices, setAllServices } = useServices();
   const { showSuccess, showError, showInfo, contextHolder } = useMessages();
   const [currentService, setCurrentService] = useState<DataType | null>(null);
+  const [allServices, setAllServices] = useState<any>([]);
+  const [saved, setSaved] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    getAllServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saved]);
+
+  const getAllServices = async () => {
+    try {
+      const response = await client.from("servicios").select();
+      if (response.status === 200 || response.status === 201) {
+        setAllServices(response?.data);
+        setSaved(true);
+      }
+    } catch (err) {
+      showError(
+        "No se pudieron cargar los servicios, contacte al proveedor del software"
+      );
+    }
+  };
 
   const handleEdit = (service: DataType) => {
     setCurrentService(service);
@@ -42,7 +62,7 @@ const ServicesScreen: React.FC = () => {
         .single();
 
       if (response.status === 200 || response.status === 204) {
-        const newData = allServices.filter((item: DataType) => item.id !== id);
+        const newData = allServices?.filter((item: DataType) => item.id !== id);
         setAllServices(newData);
         showSuccess("Servicio eliminado exitosamente");
       } else {
@@ -60,7 +80,7 @@ const ServicesScreen: React.FC = () => {
     form.resetFields();
     setIsAddingNew(true);
     setIsModalVisible(true);
-    form.setFieldsValue({ estado: true }); // Establecer el estado inicial del Switch al crear nuevo servicio
+    form.setFieldsValue({ estado: true });
   };
 
   const handleSave = async () => {
@@ -92,57 +112,46 @@ const ServicesScreen: React.FC = () => {
         const response = await client
           .from("servicios")
           .insert([formattedValues]);
-
         if (response.status === 201) {
           const insertedService: any = response.data?.[0];
-          if (insertedService) {
-            setAllServices((prevServices: DataType[]) => [
-              ...prevServices,
-              { ...formattedValues, id: insertedService.id },
-            ]);
-            showSuccess("Servicio agregado exitosamente");
-          } else {
-            showInfo(
-              "No se recibió la respuesta esperada del servidor al agregar el servicio"
-            );
-          }
+          setAllServices((prevServices: DataType[]) => [
+            ...prevServices,
+            { ...formattedValues, id: insertedService?.id },
+          ]);
+          showSuccess("Servicio agregado exitosamente");
         } else {
-          showInfo(
-            "Por favor intente agregar esta cita nuevamente en unos segundos"
-          );
-        }
-      } else {
-        if (currentService) {
-          const response = await client
-            .from("servicios")
-            .update(updatedFields)
-            .eq("id", currentService.id);
+          if (currentService) {
+            const response = await client
+              .from("servicios")
+              .update(updatedFields)
+              .eq("id", currentService.id);
 
-          if (
-            response.status === 200 ||
-            response.status === 204 ||
-            response.status === 201
-          ) {
-            const updatedService = {
-              ...currentService,
-              ...updatedFields,
-            };
-            setAllServices((prevServices: DataType[]) =>
-              prevServices.map((item: DataType) =>
-                item.id === currentService.id ? updatedService : item
-              )
-            );
-            showSuccess("Servicio actualizado exitosamente");
-          } else {
-            showInfo(
-              "Por favor intente actualizar este servicio nuevamente en unos segundos"
-            );
+            if (
+              response.status === 200 ||
+              response.status === 204 ||
+              response.status === 201
+            ) {
+              const updatedService = {
+                ...currentService,
+                ...updatedFields,
+              };
+              setAllServices((prevServices: DataType[]) =>
+                prevServices.map((item: DataType) =>
+                  item.id === currentService.id ? updatedService : item
+                )
+              );
+              showSuccess("Servicio actualizado exitosamente");
+            } else {
+              showInfo(
+                "Por favor intente actualizar este servicio nuevamente en unos segundos"
+              );
+            }
           }
         }
-      }
 
-      setIsModalVisible(false);
-      setCurrentService(null);
+        setIsModalVisible(false);
+        setCurrentService(null);
+      }
     } catch (error) {
       showError(
         "Ocurrió un error en la App, comunícate con el proveedor del software"
