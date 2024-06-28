@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button, Form, Input, Popconfirm, Table, Modal, Switch } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
-import { client } from "../../../../supabase/client";
 import { useMessages } from "../../../../hooks/useMessages";
 import type { TableColumnsType } from "antd";
-import { useServices } from "../../../../hooks/useServices";
 import {
   deleteService,
   getServices,
@@ -145,9 +142,9 @@ const ServicesScreen: React.FC = () => {
       dataIndex: "operation",
       render: (_, record) =>
         allServices.length >= 1 ? (
-          <div className="flex gap-x-3">
+          <div className='flex gap-x-3'>
             <Popconfirm
-              title="¿Eliminar servicio?"
+              title='¿Eliminar servicio?'
               onConfirm={() => handleDelete(record.id!)}
             >
               <Button
@@ -197,7 +194,7 @@ const ServicesScreen: React.FC = () => {
           {contextHolder}
           <Button
             onClick={handleAddNew}
-            type="primary"
+            type='primary'
             style={{ marginBottom: 16 }}
           >
             Crear servicio
@@ -209,7 +206,7 @@ const ServicesScreen: React.FC = () => {
               ...service,
               key: service?.id,
             }))}
-            size="small"
+            size='small'
             pagination={{ pageSize: 5 }}
           />
           <Modal
@@ -218,10 +215,10 @@ const ServicesScreen: React.FC = () => {
             onOk={handleSave}
             onCancel={handleCancel}
           >
-            <Form form={form} layout="vertical">
+            <Form form={form} layout='vertical'>
               <Form.Item
-                name="nombre_servicio"
-                label="Nombre del servicio"
+                name='nombre_servicio'
+                label='Nombre del servicio'
                 rules={[
                   {
                     required: true,
@@ -232,8 +229,8 @@ const ServicesScreen: React.FC = () => {
                 <Input />
               </Form.Item>
               <Form.Item
-                name="costo"
-                label="Valor del servicio"
+                name='costo'
+                label='Valor del servicio'
                 rules={[
                   {
                     required: true,
@@ -241,9 +238,9 @@ const ServicesScreen: React.FC = () => {
                   },
                 ]}
               >
-                <Input type="number" step="any" />
+                <Input type='number' step='any' />
               </Form.Item>
-              <Form.Item name="estado" label="Estado del servicio">
+              <Form.Item name='estado' label='Estado del servicio'>
                 <Switch
                   onChange={(checked) =>
                     form.setFieldsValue({ estado: checked })
