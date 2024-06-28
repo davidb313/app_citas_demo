@@ -1,5 +1,4 @@
 import { Card, Typography } from "antd";
-import BARBERO from "../assets/BARBERO.webp";
 
 interface CardProps {
   id: string;
@@ -53,7 +52,7 @@ export const RecipeReviewCard: React.FC<CardProps> = ({
       onClick={handleServiceClick}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
-        <img
+        {/* <img
           alt='foto servicio'
           src={BARBERO}
           style={{
@@ -62,7 +61,7 @@ export const RecipeReviewCard: React.FC<CardProps> = ({
             objectFit: "cover",
             marginRight: 16,
           }}
-        />
+        /> */}
         <div>
           <Typography.Title level={5}>{name}</Typography.Title>
           <Typography.Text type='secondary'>
