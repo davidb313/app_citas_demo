@@ -63,7 +63,7 @@ const deleteService = async (serviceId: string) => {
       .eq("id", serviceId)
       .single();
     const { status } = response;
-    return status === STATUS_CODE || STATUS_CODE_204;
+    return status === STATUS_CODE || status === STATUS_CODE_204;
   } catch (error) {
     console.log("Error", error);
     throw error;
