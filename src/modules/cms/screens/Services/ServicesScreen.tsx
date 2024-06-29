@@ -135,6 +135,12 @@ const ServicesScreen: React.FC = () => {
     setIsAddingNew(false);
   };
 
+  const formatCurrency = (value: number) => {
+    return `$ ${new Intl.NumberFormat("es-ES", {
+      minimumFractionDigits: 0,
+    }).format(value)}`;
+  };
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Acciones",
@@ -176,6 +182,7 @@ const ServicesScreen: React.FC = () => {
     {
       title: "Valor",
       dataIndex: "costo",
+      render: (text) => formatCurrency(text),
     },
     {
       title: "Activo",

@@ -14,7 +14,11 @@ import type { TableColumnsType } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import utc from "dayjs/plugin/utc";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  WhatsAppOutlined,
+} from "@ant-design/icons";
 import { useMessages } from "../../../../hooks/useMessages";
 import { useServices } from "../../../../hooks/useServices";
 import {
@@ -227,6 +231,26 @@ const AppointmentsTable: React.FC = () => {
     {
       title: "Teléfono del cliente",
       dataIndex: "telefono_cliente",
+      render: (text) => (
+        <a
+          href={`https://wa.me/${text}`}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          <Button
+            icon={<WhatsAppOutlined />}
+            type='link'
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            {text}
+          </Button>
+        </a>
+      ),
     },
     {
       title: "Comentarios del cliente",

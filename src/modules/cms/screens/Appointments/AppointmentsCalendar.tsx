@@ -98,6 +98,7 @@ const AppointmentsCalendar: React.FC = () => {
           renderItem={(appointment: any) => (
             <List.Item>
               <List.Item.Meta
+                className='font-bold'
                 title={`${appointment.nombre_cliente} - ${dayjs(
                   appointment.hora_servicio,
                   "HH:mm:ss"
