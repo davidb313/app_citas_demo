@@ -7,6 +7,8 @@ import {
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
+import { LogoutOutlined } from "@ant-design/icons";
+import { client } from "../../../supabase/client";
 
 const { Header, Sider, Content } = Layout;
 
@@ -17,6 +19,12 @@ type MenuClickEvent = MenuProps["onClick"];
 
 const LayoutCms: React.FC = () => {
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const response = client.auth.signOut;
+    console.log(response);
+    navigate("/cms");
+  };
 
   const routeMap: RouteMap = {
     "0": "/app/appointment",
@@ -62,16 +70,28 @@ const LayoutCms: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
-          <Button
-            type='text'
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 64,
-              height: 64,
-            }}
-          />
+          <div className='flex items-center justify-between mr-4'>
+            <Button
+              type='text'
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: "16px",
+                width: 64,
+                height: 64,
+              }}
+            />
+
+            <Button
+              onClick={handleLogout}
+              type='link'
+              shape='round'
+              icon={<LogoutOutlined />}
+              size='small'
+            >
+              Salir
+            </Button>
+          </div>
         </Header>
         <Content
           style={{

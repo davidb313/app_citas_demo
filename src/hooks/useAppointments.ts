@@ -7,7 +7,7 @@ export const useAppointments = () => {
   const { showError } = useMessages();
 
   useEffect(() => {
-    const getAllServices = async () => {
+    const getAllAppointments = async () => {
       try {
         const response = await client.from("citas").select(`
           id,
@@ -38,7 +38,7 @@ export const useAppointments = () => {
       }
     };
 
-    getAllServices();
+    getAllAppointments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -5,6 +5,7 @@ interface CardProps {
   name: string;
   selectedServiceId: string | null;
   costo: string | null;
+  estado: boolean;
   setSelectedServiceId: React.Dispatch<React.SetStateAction<string | null>>;
   setSelectedServiceName: React.Dispatch<React.SetStateAction<string | null>>;
   setSelectedServiceCost: React.Dispatch<React.SetStateAction<string | null>>;
@@ -15,6 +16,7 @@ export const RecipeReviewCard: React.FC<CardProps> = ({
   name,
   selectedServiceId,
   setSelectedServiceId,
+  estado,
   setSelectedServiceName,
   costo,
   setSelectedServiceCost,
@@ -41,18 +43,21 @@ export const RecipeReviewCard: React.FC<CardProps> = ({
       : "N/A";
 
   return (
-    <Card
-      size='small'
-      hoverable
-      style={{
-        marginTop: 16,
-        border: selectedServiceId === id ? "2px solid blue" : "",
-        cursor: "pointer",
-      }}
-      onClick={handleServiceClick}
-    >
-      <div style={{ display: "flex", alignItems: "center" }}>
-        {/* <img
+    <>
+      {estado === true ? (
+        <Card
+          size='small'
+          hoverable
+          style={{
+            marginTop: 16,
+            border:
+              selectedServiceId === id ? "2px solid blue" : "1px solid black",
+            cursor: "pointer",
+          }}
+          onClick={handleServiceClick}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {/* <img
           alt='foto servicio'
           src={BARBERO}
           style={{
@@ -62,13 +67,15 @@ export const RecipeReviewCard: React.FC<CardProps> = ({
             marginRight: 16,
           }}
         /> */}
-        <div>
-          <Typography.Title level={5}>{name}</Typography.Title>
-          <Typography.Text type='secondary'>
-            Valor servicio: {formattedCosto}
-          </Typography.Text>
-        </div>
-      </div>
-    </Card>
+            <div>
+              <Typography.Title level={5}>{name}</Typography.Title>
+              <Typography.Text type='secondary'>
+                Valor servicio: {formattedCosto}
+              </Typography.Text>
+            </div>
+          </div>
+        </Card>
+      ) : null}
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Button,
   Popconfirm,
@@ -14,71 +14,78 @@ import type { TableColumnsType } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import utc from "dayjs/plugin/utc";
-import { useAppointments } from "../../../../hooks/useAppointments";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { client } from "../../../../supabase/client";
 import { useMessages } from "../../../../hooks/useMessages";
 import { useServices } from "../../../../hooks/useServices";
+import {
+  IAppointment,
+  deleteAppointment,
+  getAppointments,
+  insertAppointment,
+  updateAppointment,
+} from "../../api/services/appointment.service";
+import { Spinner } from "../../../../components";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 
-interface DataType {
-  key: React.Key;
-  id?: string;
-  servicio_solicitado: string;
-  fecha_servicio: string;
-  hora_servicio: string;
-  nombre_cliente: string;
-  telefono_cliente: string;
-  comentarios: string;
-}
-
 const AppointmentsTable: React.FC = () => {
-  const { allAppointments, setAllAppointments } = useAppointments();
+  const [allAppointments, setAllAppointments] = useState<any>([]);
+
   const { allServices } = useServices();
   const { showSuccess, showError, showInfo, contextHolder } = useMessages();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentAppointment, setCurrentAppointment] = useState<DataType | null>(
-    null
-  );
+  const [currentAppointment, setCurrentAppointment] =
+    useState<IAppointment | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [form] = Form.useForm();
 
+  const getAllAppointments = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await getAppointments();
+      const transformedData = response?.map((item: any) => ({
+        ...item,
+        servicio_solicitado: item?.servicio_solicitado?.nombre_servicio,
+      }));
+      setAllAppointments(transformedData ? transformedData : []);
+      setIsLoading(false);
+    } catch (err) {
+      showError(
+        "No se pudieron cargar las citas, contacte al proveedor del software"
+      );
+      setIsLoading(false);
+    }
+  }, [showError]);
+
+  useEffect(() => {
+    getAllAppointments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleDelete = async (id: string) => {
     try {
-      if (allAppointments.length > 0) {
-        const response = await client
-          .from("citas")
-          .delete()
-          .eq("id", id)
-          .single();
-
-        if (response.status === 200 || response.status === 204) {
-          const newData = allAppointments.filter(
-            (item: DataType) => item.id !== id
-          );
-          setAllAppointments(newData);
-          showSuccess("Cita eliminada exitosamente");
-        } else {
-          showInfo("Por favor intente eliminar esta cita en unos segundos");
-        }
+      const response = await deleteAppointment(id);
+      if (response) {
+        showSuccess("Servicio eliminado exitosamente");
+        await getAllAppointments();
       } else {
-        showInfo("No hay citas disponibles para eliminar");
+        showInfo("Por favor intente eliminar este servicio en unos segundos");
       }
     } catch (error) {
       showError(
-        "Ocurrió un error en la App, comunícate con en el proveedor del software"
+        "Ocurrió un error en la App, comunícate con el proveedor del software"
       );
     }
   };
 
-  const handleEdit = (appointment: DataType) => {
+  const handleEdit = (appointment: IAppointment) => {
     setCurrentAppointment(appointment);
     form.setFieldsValue({
       ...appointment,
-      fecha_servicio: dayjs(appointment.fecha_servicio),
+      fecha_servicio: dayjs(appointment.fecha_servicio, "YYYY-MM-DD"),
       hora_servicio: dayjs(appointment.hora_servicio, "HH:mm"),
     });
     setIsAddingNew(false);
@@ -101,7 +108,7 @@ const AppointmentsTable: React.FC = () => {
         hora_servicio: values.hora_servicio.format("HH:mm"),
       };
 
-      let updatedFields: Partial<DataType> = {};
+      let updatedFields: Partial<IAppointment> = {};
 
       if (currentAppointment) {
         if (
@@ -138,51 +145,18 @@ const AppointmentsTable: React.FC = () => {
       }
 
       if (isAddingNew) {
-        const response = await client.from("citas").insert([formattedValues]);
-
-        if (response.status === 201) {
-          const insertedAppointment: any = response.data?.[0];
-          if (insertedAppointment) {
-            setAllAppointments((prevAppointments: DataType[]) => [
-              ...prevAppointments,
-              { ...formattedValues, id: insertedAppointment.id },
-            ]);
-            showSuccess("Cita agregada exitosamente");
-          } else {
-            showInfo(
-              "No se recibió la respuesta esperada del servidor al agregar la cita"
-            );
-          }
-        } else {
-          showInfo(
-            "Por favor intente agregar esta cita nuevamente en unos segundos"
-          );
-        }
+        // insert
+        const response = await insertAppointment(formattedValues);
+        if (response) showSuccess("Cita agregada exitosamente");
       } else {
-        if (currentAppointment) {
-          const response = await client
-            .from("citas")
-            .update(updatedFields)
-            .eq("id", currentAppointment.id);
-
-          if (response.status === 200 || response.status === 204) {
-            const updatedAppointment = {
-              ...currentAppointment,
-              ...updatedFields,
-            };
-            setAllAppointments((prevAppointments: DataType[]) =>
-              prevAppointments.map((item: DataType) =>
-                item.id === currentAppointment.id ? updatedAppointment : item
-              )
-            );
-            showSuccess("Cita actualizada exitosamente");
-          } else {
-            showInfo(
-              "Por favor intente actualizar esta cita nuevamente en unos segundos"
-            );
-          }
-        }
+        // update
+        const response = await updateAppointment(
+          updatedFields,
+          currentAppointment?.id ?? ""
+        );
+        if (response) showSuccess("Cita actualizada exitosamente");
       }
+      await getAllAppointments();
 
       setIsModalVisible(false);
       setCurrentAppointment(null);
@@ -199,7 +173,7 @@ const AppointmentsTable: React.FC = () => {
     setIsAddingNew(false);
   };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<IAppointment> = [
     {
       title: "Acciones",
       dataIndex: "operation",
@@ -239,10 +213,12 @@ const AppointmentsTable: React.FC = () => {
     {
       title: "Fecha del servicio",
       dataIndex: "fecha_servicio",
+      render: (text) => dayjs(text).format("DD-MM-YYYY"),
     },
     {
       title: "Hora del servicio",
       dataIndex: "hora_servicio",
+      render: (text) => dayjs(text, "HH:mm").format("HH:mm"),
     },
     {
       title: "Nombre del cliente",
@@ -265,103 +241,109 @@ const AppointmentsTable: React.FC = () => {
   ];
 
   return (
-    <>
-      {contextHolder}
-      <Button
-        type='primary'
-        style={{ marginBottom: 16 }}
-        onClick={handleAddNew}
-      >
-        Agregar cita
-      </Button>
-      <Table
-        columns={columns}
-        dataSource={allAppointments?.map((appointment: any) => ({
-          ...appointment,
-          key: appointment?.id,
-        }))}
-        size='small'
-        pagination={{ pageSize: 10 }}
-      />
-      <Modal
-        title={isAddingNew ? "Agregar Cita" : "Editar Cita"}
-        open={isModalVisible}
-        onOk={handleSave}
-        onCancel={handleCancel}
-      >
-        <Form form={form} layout='vertical'>
-          <Form.Item
-            name='servicio_solicitado'
-            label='Servicio solicitado'
-            rules={[
-              {
-                required: true,
-                message: "Por favor seleccione el servicio solicitado",
-              },
-            ]}
+    <div>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <div>
+          {contextHolder}
+          <Button
+            type='primary'
+            style={{ marginBottom: 16 }}
+            onClick={handleAddNew}
           >
-            <Select>
-              {allServices.map((service: any) => (
-                <Select.Option key={service.id} value={service.id}>
-                  {service.nombre_servicio}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name='fecha_servicio'
-            label='Fecha del servicio'
-            rules={[
-              {
-                required: true,
-                message: "Por favor seleccione la fecha del servicio",
-              },
-            ]}
+            Agregar cita
+          </Button>
+          <Table
+            columns={columns}
+            dataSource={allAppointments?.map((appointment: any) => ({
+              ...appointment,
+              key: appointment?.id,
+            }))}
+            size='small'
+            pagination={{ pageSize: 10 }}
+          />
+          <Modal
+            title={isAddingNew ? "Agregar Cita" : "Editar Cita"}
+            open={isModalVisible}
+            onOk={handleSave}
+            onCancel={handleCancel}
           >
-            <DatePicker format='DD-MM-YYYY' />
-          </Form.Item>
-          <Form.Item
-            name='hora_servicio'
-            label='Hora del servicio'
-            rules={[
-              {
-                required: true,
-                message: "Por favor seleccione la hora del servicio",
-              },
-            ]}
-          >
-            <TimePicker format='HH:mm' />
-          </Form.Item>
-          <Form.Item
-            name='nombre_cliente'
-            label='Nombre del cliente'
-            rules={[
-              {
-                required: true,
-                message: "Por favor ingrese el nombre del cliente",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name='telefono_cliente'
-            label='Teléfono del cliente'
-            rules={[
-              {
-                required: true,
-                message: "Por favor ingrese el teléfono del cliente",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name='comentarios' label='Comentarios del cliente'>
-            <Input.TextArea />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+            <Form form={form} layout='vertical'>
+              <Form.Item
+                name='servicio_solicitado'
+                label='Servicio solicitado'
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor seleccione el servicio solicitado",
+                  },
+                ]}
+              >
+                <Select>
+                  {allServices.map((service: any) => (
+                    <Select.Option key={service.id} value={service.id}>
+                      {service.nombre_servicio}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name='fecha_servicio'
+                label='Fecha del servicio'
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor seleccione la fecha del servicio",
+                  },
+                ]}
+              >
+                <DatePicker format='DD-MM-YYYY' />
+              </Form.Item>
+              <Form.Item
+                name='hora_servicio'
+                label='Hora del servicio'
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor seleccione la hora del servicio",
+                  },
+                ]}
+              >
+                <TimePicker format='HH:mm' />
+              </Form.Item>
+              <Form.Item
+                name='nombre_cliente'
+                label='Nombre del cliente'
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingrese el nombre del cliente",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name='telefono_cliente'
+                label='Teléfono del cliente'
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingrese el teléfono del cliente",
+                  },
+                ]}
+              >
+                <Input type='number' step='any' />
+              </Form.Item>
+              <Form.Item name='comentarios' label='Comentarios del cliente'>
+                <Input.TextArea />
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      )}
+    </div>
   );
 };
 

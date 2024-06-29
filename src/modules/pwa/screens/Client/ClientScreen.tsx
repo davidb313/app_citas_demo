@@ -137,6 +137,7 @@ export default function ClientScreen() {
             <RecipeReviewCard
               key={service?.id}
               id={service?.id}
+              estado={service?.estado}
               name={service?.nombre_servicio}
               costo={service?.costo}
               setSelectedServiceCost={setSelectedServiceCost}
