@@ -1,32 +1,26 @@
 import { UserOutlined } from "@ant-design/icons";
 
-import { Card, Row, Col, Button, Form, Input, message } from "antd";
+import { Card, Row, Col, Button, Form, Input } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { client } from "../../../../supabase/client";
+import { useMessages } from "../../../../hooks/useMessages";
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showSuccess, showError, contextHolder } = useMessages();
 
   const navigate = useNavigate();
-
-  const error = () => {
-    messageApi.open({
-      type: "error",
-      content: "El email proporcionado no está autorizado",
-    });
-  };
 
   const validateEmail = (_: any, value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!value || emailRegex.test(value)) {
-      setIsEmailValid(true); // Actualiza el estado a válido
+      setIsEmailValid(true);
       return Promise.resolve();
     } else {
-      setIsEmailValid(false); // Actualiza el estado a no válido
+      setIsEmailValid(false);
       return Promise.reject(new Error("Ingresa un correo válido"));
     }
   };
@@ -37,10 +31,15 @@ const LoginScreen: React.FC = () => {
         email,
       });
       if (response.error === null) {
+        showSuccess(
+          "Te enviamos un correo, sigue las instrucciones para ingresar a la App"
+        );
         navigate("/app");
       }
     } catch (err) {
-      error();
+      showError(
+        "Se detectó un error en la autenticación, valida si el correo ingresado es correcto"
+      );
     }
   };
 
