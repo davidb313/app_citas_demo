@@ -1,16 +1,18 @@
-import { UserOutlined } from "@ant-design/icons";
-
+import { UserOutlined, SafetyOutlined } from "@ant-design/icons";
 import { Card, Row, Col, Button, Form, Input } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { client } from "../../../../supabase/client";
 import { useMessages } from "../../../../hooks/useMessages";
+import { Spinner } from "../../../../components";
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { showSuccess, showError, contextHolder } = useMessages();
+  const { showError, contextHolder } = useMessages();
 
   const navigate = useNavigate();
 
@@ -27,69 +29,94 @@ const LoginScreen: React.FC = () => {
 
   const onFinish = async () => {
     try {
-      const response = await client.auth.signInWithOtp({
+      setIsLoading(true);
+      const { data } = await client.auth.signInWithPassword({
         email,
+        password,
       });
-      if (response.error === null) {
-        showSuccess(
-          "Te enviamos un correo, sigue las instrucciones para ingresar a la App"
-        );
+      console.log(data);
+      if (data.session) {
+        localStorage.setItem("isAuthenticated", "true");
         navigate("/app");
+      } else {
+        showError(
+          "Se detectó un error en la autenticación, valida si el correo o la contraseña son correctos"
+        );
       }
     } catch (err) {
       showError(
-        "Se detectó un error en la autenticación, valida si el correo ingresado es correcto"
+        "Error en la autenticación, valida si el correo o la contraseña son correctos"
       );
     }
+    setIsLoading(false);
   };
 
   return (
     <>
       {contextHolder}
-      <Row
-        justify='center'
-        align='middle'
-        style={{ minHeight: "100vh", padding: 10 }}
-      >
-        <Col xs={24} sm={16} md={12} lg={8}>
-          <Card title='Iniciar Sesión'>
-            <Form
-              name='normal_login'
-              className='login-form'
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-            >
-              <Form.Item
-                name='username'
-                rules={[
-                  { required: true, message: "Por favor ingrese su correo" },
-                  { validator: validateEmail },
-                ]}
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <Row
+          justify='center'
+          align='middle'
+          style={{ minHeight: "100vh", padding: 10 }}
+        >
+          <Col xs={24} sm={16} md={12} lg={8}>
+            <Card title='Iniciar Sesión'>
+              <Form
+                name='normal_login'
+                className='login-form'
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
               >
-                <Input
-                  prefix={<UserOutlined className='site-form-item-icon' />}
-                  placeholder='Email'
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  disabled={!isEmailValid || email === ""}
-                  type='primary'
-                  style={{ width: "100%" }}
-                  size='large'
-                  shape='round'
-                  htmlType='submit'
-                  className='login-form-button mt-4'
+                <Form.Item
+                  name='username'
+                  rules={[
+                    { required: true, message: "Por favor ingrese su correo" },
+                    { validator: validateEmail },
+                  ]}
                 >
-                  Continuar
-                </Button>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+                  <Input
+                    prefix={<UserOutlined className='site-form-item-icon' />}
+                    placeholder='Email'
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item
+                  name='password'
+                  rules={[
+                    {
+                      required: true,
+                      message: "Por favor ingrese su contraseña",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    prefix={<SafetyOutlined className='site-form-item-icon' />}
+                    placeholder='Contraseña'
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </Form.Item>
+
+                <Form.Item>
+                  <Button
+                    disabled={!isEmailValid || email === "" || password === ""}
+                    type='primary'
+                    style={{ width: "100%" }}
+                    size='large'
+                    shape='round'
+                    htmlType='submit'
+                    className='login-form-button mt-4'
+                  >
+                    Continuar
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
+      )}
     </>
   );
 };

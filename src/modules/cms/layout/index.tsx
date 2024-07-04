@@ -21,9 +21,13 @@ const LayoutCms: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const response = client.auth.signOut;
-    console.log(response);
-    navigate("/cms");
+    try {
+      await client.auth.signOut();
+      localStorage.removeItem("isAuthenticated");
+      navigate("/cms");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   const routeMap: RouteMap = {
