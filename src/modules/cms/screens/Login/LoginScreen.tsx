@@ -34,7 +34,6 @@ const LoginScreen: React.FC = () => {
         email,
         password,
       });
-      console.log(data);
       if (data.session) {
         localStorage.setItem("isAuthenticated", "true");
         navigate("/app");
@@ -60,7 +59,7 @@ const LoginScreen: React.FC = () => {
         <Row
           justify='center'
           align='middle'
-          style={{ minHeight: "100vh", padding: 10 }}
+          style={{ minHeight: "100vh", padding: 10, boxShadow: "10" }}
         >
           <Col xs={24} sm={16} md={12} lg={8}>
             <Card title='Iniciar Sesión'>
