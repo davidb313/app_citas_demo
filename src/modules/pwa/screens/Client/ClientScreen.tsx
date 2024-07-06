@@ -109,22 +109,41 @@ export default function ClientScreen() {
           <h1 className='mt-2 text-2xl font-bold'>Citas [nombre de negocio]</h1>
           <p className='mt-2 text-sm'>
             Para cancelar o reprogramar una cita agendada, comunícate con
-            nosotros
-            <a
-              href='https://api.whatsapp.com/send?phone=573045528606'
-              style={{ marginLeft: 5 }}
-              target='_blank'
-              rel='noopener noreferrer'
+            nosotros {""}
+            <Button
+              size='small'
+              type='text'
+              style={{
+                backgroundColor: "#25D366",
+                color: "#ffffff",
+                borderRadius: "20px",
+              }}
             >
-              <span
+              <a
+                href='https://api.whatsapp.com/send?phone=573045528606'
                 style={{
-                  display: "inline-block",
-                  verticalAlign: "middle",
+                  display: "flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  color: "#ffffff",
                 }}
+                target='_blank'
+                rel='noopener noreferrer'
               >
-                <WhatsAppOutlined style={{ fontSize: "20px" }} />
-              </span>
-            </a>
+                <WhatsAppOutlined
+                  style={{ fontSize: "15px", marginRight: 5, color: "#ffffff" }}
+                />
+                <span
+                  style={{
+                    fontSize: 10,
+                    display: "inline-block",
+                    verticalAlign: "middle",
+                  }}
+                >
+                  Chatear por WhatsApp
+                </span>
+              </a>
+            </Button>
           </p>
         </div>
 
