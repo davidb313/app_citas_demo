@@ -15,6 +15,7 @@ import dayjs, { Dayjs } from "dayjs";
 import logoBarberia from "../../assets/logoBarberia.avif";
 import { useServices } from "../../../../hooks/useServices";
 import { useMessages } from "../../../../hooks/useMessages";
+import InstallPWAButton from "../../components/InstallPWAButton";
 
 export default function ClientScreen() {
   const { allServices } = useServices();
@@ -102,6 +103,9 @@ export default function ClientScreen() {
   return (
     <>
       {contextHolder}
+      <div className='flex justify-end'>
+        <InstallPWAButton />
+      </div>
 
       <div className='p-5'>
         <div className='flex flex-col items-center'>
