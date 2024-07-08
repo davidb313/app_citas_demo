@@ -47,7 +47,7 @@ const InstallPWAButton: React.FC = () => {
     <div>
       {isVisible && (
         <Button type='text' onClick={handleInstallClick}>
-          Instalar App en tu teléfono
+          <span className='text-xs'>Instalar App en tu teléfono</span>
         </Button>
       )}
     </div>
