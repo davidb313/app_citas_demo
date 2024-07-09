@@ -229,6 +229,10 @@ export default function ClientScreen() {
           </Button>
         </div>
       </div>
+      <p className=' text-xs flex justify-center'>
+        Hecho con ❤️ por Pan
+        <span className='text-blue-600 font-bold'>dev</span>ono Estudios
+      </p>
     </>
   );
 }
